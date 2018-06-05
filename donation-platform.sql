@@ -1,20 +1,28 @@
-CREATE DATABASE IF NOT EXISTS donation-platform;
+DROP TABLE IF EXISTS donators;
+DROP TABLE IF EXISTS organisations;
 
-DROP TABLE IF EXISTS users;
-
--- alter session set NLS_DATE_FORMAT='DD/MM/YYYY';
-
-CREATE TABLE users (
-	id int(11) not null PRIMARY KEY AUTO_INCREMENT,
-	uid varchar(128) not null,
-	eid varchar(128) not null,
-	pwd varchar(128) not null,
-
-	full_name varchar(128) not null,
-	gender char(1) not null,
-	birthday datetime not null,
-	phone_number char(7) not null
+CREATE TABLE donators (
+    id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name varchar(20) NOT NULL,
+    email varchar(128) NOT NULL,
+    password varchar(128) NOT NULL
 );
 
-INSERT INTO users (id, uid, eid, pwd, full_name, gender, birthday, phone_number) 
-	VALUES (0, 'admin', 'admin@sunway.com', '$2y$10$0rqgL.L0hRFnP9KHSUsp/ui2n.N/4Azn359OsHQ/CdQKRPPp.5D1W', 'Lishan Abbas', 'M', '1998-06-25', '9894449');
+CREATE TABLE organisations (
+    id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name varchar(20) NOT NULL,
+    email varchar(128) NOT NULL,
+    password varchar(128) NOT NULL
+);
+
+CREATE TABLE followers {
+	id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	user_id int(11) NOT NULL,
+	follower_id int(11) NOT NULL,
+}
+
+INSERT INTO donators (id, name, email, password) 
+VALUES (0, 'John Smith', 'john@email.com', '$2y$10$0rqgL.L0hRFnP9KHSUsp/ui2n.N/4Azn359OsHQ/CdQKRPPp.5D1W');
+
+INSERT INTO organisations (id, name, email, password) 
+VALUES (0, 'GiveWell', 'givewell@email.com', '$2y$10$0rqgL.L0hRFnP9KHSUsp/ui2n.N/4Azn359OsHQ/CdQKRPPp.5D1W');

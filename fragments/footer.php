@@ -1,11 +1,43 @@
-</div></div></div>
-<footer>
-footer
+<footer class="page-footer teal darken-2" style="margin-top: 0px; bottom: 0">
+	<div class="container" style="width: 90%">
+		<div class="row" ">
+			<div class="col l3 " style="line-height: ">
+				<h5 class="white-text">Logo</h5>
+			</div>
+			<div class="col l3 " style="text-align: left; line-height: 30px">
+				<h5 class="white-text">Learn More</h5>
+				<ul class="footer-list" >
+					<li><a class="grey-text text-lighten-3" href="#">How It Works</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Our Voice</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Stories</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Fundraising Tips</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">About Us</a></li>
+				</ul>
+			</div>
+			<div class="col l3" style="text-align: left; line-height: 30px ">
+				<h5 class="white-text">Browse Categories</h5>
+				<ul class="footer-list">
+					<li><a class="grey-text text-lighten-3" href="#">Clubs and communities</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Environment</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Hunger</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Poverty</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Animals</a></li>
+				</ul>
+			</div>
+
+			<div class="col l3" style="text-align: left; line-height: 30px">
+				<h5 class="white-text">Customer Service</h5>
+				<ul class="footer-list">
+					<li><a class="grey-text text-lighten-3" href="#">Help & FAQS</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Terms of Service</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Privacy Policy</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Contact Us</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Site Map</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="footer-copyright" style="padding-left: 5%">© 2018 Copyright</div>
 </footer>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
 </body>
-
 </html>
