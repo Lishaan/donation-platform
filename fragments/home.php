@@ -3,60 +3,26 @@ $root_dir = $_SERVER["DOCUMENT_ROOT"];
 
 require($root_dir . '/components/home_event.php'); 
 ?>
-
-<style type="text/css" media="screen">
-.section {
-	text-align: center;
-}
-
-.footer-list > li > a{
-	font-size: 15px;
-	line-height: 20px
-}
-
-.centered {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	color: white;
-	font-size: 40px
-}
-
-.image-set > img {
-	margin: 20px;
-
-}
-
-#myBar {
-	width: 0%;
-	height: 30px;
-	background-color: #4CAF50;
-	text-align: center;
-	line-height: 30px;
-	color: black;
-	border-radius: 16px
-}
-</style>
+<link rel="stylesheet" href="assets/css/home.css">
 
 <!-- Carousel -->
-<div class="carousel carousel-slider center hoverable z-depth-2">
-	<div class="carousel-item green" href="">
+<div class="carousel carousel-slider center z-depth-2">
+	<div class="carousel-item teal lighten-2" href="">
 		<h2>Panel</h2>
 		<p class="white-text">Panel A</p>
 	</div>
-	<div class="carousel-item green" href="">
+	<div class="carousel-item teal lighten-2" href="">
 		<h2>Panel</h2>
 		<p class="white-text">Panel B</p>
 	</div>
-	<div class="carousel-item green" href="">
+	<div class="carousel-item teal lighten-2" href="">
 		<h2>Panel</h2>
 		<p class="white-text">Panel C</p>
 	</div>
 </div>
 
 <!-- Trending Events -->
-<div class="container white col s12" style="width: 70%; margin-bottom: 40px;">
+<div class="container col s12" style="width: 70%; margin-bottom: 40px;">
 	<div class="row" style="margin-top: 20px;">
 		<h4 class="left"><b>Trending Events</b></h4>
 	</div>
@@ -71,7 +37,6 @@ require($root_dir . '/components/home_event.php');
 			"assets/img/sample-1.jpg",
 			"assets/img/traffickingEvent.jpg"
 		);
-
 		?>
 		<script type="text/javascript">
 			var percentages = [];
@@ -112,7 +77,7 @@ require($root_dir . '/components/home_event.php');
 </div>
 
 <!-- Get You Started -->
-<div class="section white" style="margin-top: 20px">
+<div class="section white" style="padding-top: 20px">
 	<div class="row container" style="text-align: center; margin-bottom: 20px">
 		<h4 style="color: black; margin: 0px">To Get You Started</h4>
 		<p class="grey-text text-darken-3 lighten-3"></p>

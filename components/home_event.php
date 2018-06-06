@@ -34,7 +34,7 @@
 <?php function render_home_event($id = 0, $url = "#", $img = "#", $desc = "", $money_raised = 0, $money_needed = 0) { ?>
 	<div class="col s4">
 		<a href="<?php echo $url ?>">
-			<div class="card white large hoverable z-depth-2" >
+			<div class="card white large hoverable z-depth-1" >
 				<div class="card-image"><img src="<?php echo $img ?>"></div>
 
 				<div class="card-content white-text" style="padding: 10px">

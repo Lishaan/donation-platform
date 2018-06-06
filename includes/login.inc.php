@@ -5,7 +5,7 @@ $root_dir = $_SERVER["DOCUMENT_ROOT"];
 ob_start();
 session_start();
 
-include($root_dir . '/includes/dbh.inc.php');
+require($root_dir . '/includes/dbh.inc.php');
 
 if (isset($_POST['submit'])) {
 
@@ -20,24 +20,8 @@ if (isset($_POST['submit'])) {
 			</script>
 		");
 	} else {
-
-		$result_don = mysqli_query (
-			$connection, 
-			"SELECT * FROM donators WHERE email = '$email'"
-		);
-
-		$result_org = mysqli_query (
-			$connection, 
-			"SELECT * FROM organisations WHERE email='$email'"
-		);
-
-		$result = $result_don;
-
-		if (mysqli_num_rows($result) < 1) {
-			if (mysqli_num_rows($result_org) >= 1) {
-				$result = $result_org;
-			}
-		} 
+		$sql = "SELECT * FROM users WHERE email = '$email'";
+		$result = mysqli_query($connection, $sql);
 
 		if (mysqli_num_rows($result) < 1) {
 			echo ("
@@ -61,8 +45,9 @@ if (isset($_POST['submit'])) {
 				} else if ($hashP === true) {
 					
 					// Log the user in
-					$_SESSION['u_id'] = $row['id'];
-					$_SESSION['u_email'] = $row['email'];
+					$_SESSION['user_id'] = $row['id'];
+					$_SESSION['user_name'] = $row['name'];
+					$_SESSION['user_type'] = $row['type'];
 					
 					echo ("
 						<script type='text/javascript'> 
