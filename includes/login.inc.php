@@ -51,7 +51,7 @@ if (isset($_POST['submit'])) {
 					
 					echo ("
 						<script type='text/javascript'> 
-							window.location.href='../index.php?login=success';
+							window.location.href='../profile.php?user_id=" . $_SESSION['user_id'] . "&login=success';
 						</script>
 					");
 				}

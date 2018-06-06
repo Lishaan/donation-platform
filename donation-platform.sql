@@ -25,7 +25,7 @@ CREATE TABLE posts (
     posted_at datetime NOT NULL,
 
     likes int(11) NOT NULL,
-    title varchar(32) NOT NULL,
+    title varchar(32),
     body varchar(512) NOT NULL,
 
 	FOREIGN KEY (poster_user_id) REFERENCES users (id)

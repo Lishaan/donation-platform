@@ -24,6 +24,14 @@ if ($_GET['create_post'] === "success") {
 	</script>
 	<?php
 }
+
+if ($_GET['login'] === "success") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'You have been logged in'})
+	</script>
+	<?php
+}
 ?>
 <link rel="stylesheet" href="assets/css/profile.css">
 <main>
@@ -59,19 +67,19 @@ if ($_GET['create_post'] === "success") {
 				<!-- Post Form -->
 				<?php if ($_SESSION['user_id'] === $user_id): ?>
 					<div class='row'>
-						<div class="container white" style="margin-left: 10px">
+						<div class="hoverable container white" style="margin-left: 10px">
 							<ul class="collapsible" style="margin: 0;">
 								<li>
 									<div class="collapsible-header"><i class="material-icons">forum</i><b>Create a Post</b></div>
 									<div class="collapsible-body">
       									<div style="padding: 0 20px 0 20px">
 											<form action="profile.php?user_id=<?php echo $user_id; ?>" method="POST">
-												<div class="input-field">
-										          <input autocomplete="false" name="title" id="post_title" type="text" class="validate" data-length="32">
+												<div class="input-field" style="margin-bottom: 50px">
+										          <input placeholder="(Optional)" autocomplete="false" name="title" id="post_title" type="text" class="validate" data-length="32">
 										          <label for="post_title">Title</label>
 										        </div>
 												<div class="input-field">
-										          <textarea autocomplete="false" name="body" id="post_textarea" class="materialize-textarea" data-length="512"></textarea>
+										          <textarea placeholder="Body" autocomplete="false" name="body" id="post_textarea" class="materialize-textarea" data-length="512"></textarea>
 										          <label for="post_textarea">Body</label>
 										        </div>
 
@@ -96,6 +104,11 @@ if ($_GET['create_post'] === "success") {
 				}
 
 				foreach ($posts as $post) {
+					echo("
+						<div class='row'>
+							<div class='container white z-depth-2' style='padding: 30px; margin: 0 0 30px 10px'>
+					");
+
 					$post_id = $post['id'];
 					$title = $post['title'];
 					$body = htmlspecialchars($post['body']);
@@ -111,8 +124,8 @@ if ($_GET['create_post'] === "success") {
 					$like_button = "
 						<div style='margin-bottom: 20px;'> 
 							<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
-						        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect white black-text btn' type='submit' name='like'>Unlike
-									<i class='material-icons right'>send</i>
+						        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like'>$likes
+									<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
 								</button>
 							</form>
 						</div>
@@ -121,73 +134,140 @@ if ($_GET['create_post'] === "success") {
 					$unlike_button = "
 						<div style='margin-bottom: 20px;'> 
 							<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
-						        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect white black-text btn' type='submit' name='like'>Like
-									<i class='material-icons right'>send</i>
+						        <button style='margin-top: 20px; background-color: #e37375;' class='z-depth-2 btn waves-effect' type='submit' name='like'>$likes
+									<i style='border-radius: 10px;' class='material-icons right'>thumb_down</i>
 								</button>
 							</form>
 						</div>
 					";
 
-					if (mysqli_num_rows($result) <= 0) {
+					if (mysqli_num_rows($result) > 0) {
 						$like_button = $unlike_button;
 					}
 
+					$poster_user_id = $post['poster_user_id'];
+					$sql = "SELECT * FROM users WHERE id=$poster_user_id";
+					$result = mysqli_query($connection, $sql);
+					$row = mysqli_fetch_assoc($result);
+
+					$poster_user_name = $row['name'];
+
 					if ($_SESSION['user_id'] === $user_id) {
-						$like_button = "";
+						$like_button = "
+							<div style='margin-bottom: 20px;'> 
+								<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
+							        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like' disabled>$likes
+										<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
+									</button>
+								</form>
+							</div>
+						";
 					}
-
-					$comment_button = "
-						<div>
-							<ul class='collapsible' style='margin: 0;'>
-								<li>
-									<div class='collapsible-header'><i class='material-icons'>forum</i><b>Comment</b></div>
-									<div class='collapsible-body'>
-											<div style='padding: 0 20px 0 20px'>
-											<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
-												<div class='input-field'>
-										          <textarea autocomplete='false' name='comment_body' id='comment_textarea' class='materialize-textarea' data-length='256'></textarea>
-										          <label for='comment_textarea'>Your comment</label>
-										        </div>
-
-										        <button disabled style='margin-top: 20px' class='btn waves-effect waves-light btn-large' type='submit' name='comment' id='comment_submit'>Submit
-												    <i class='material-icons right'>send</i>
-												</button>
-											</form>
-										</div>
-									</div>
-								</li>
-							</ul>
-						</div>
-					";
 
 					// Render post
 					echo ("
-						<div class='row'>
-							<div class='container white z-depth-2' style='padding: 30px; margin-left: 10px'>
-								<span class='black-text'>
-									<h5><b>$title</b></h5>
-									<b>Posted at: </b><text style='color: #90949c'>$date at $time</text>
-									<p>$body</p>
-									$likes
-									$like_button
-									$comment_button
-								</span>
+						<span class='black-text'>
+							<a style='color: inherit;' href='profile.php?user_id=$poster_user_id'><h5><b>$poster_user_name</b></h5></a>
+							<b>Posted at: </b><text style='color: #90949c'>$date at $time</text>
+							$like_button
+							<div class='z-depth-1' style='margin: 20px 0 20px 0; padding: 10px 20px 10px 20px'>
+								<p style='font-size: 14pt; line-height: 5px;'><b>$title</b></p>
+								<p>$body</p>
 							</div>
-						</div>
+						</span>
 					");
 
-					$sql = "SELECT * FROM comments WHERE post_id=$post_id ORDER BY posted_at DESC;";
+					$sql = "SELECT * FROM comments WHERE post_id=$post_id ORDER BY posted_at ASC;";
 					$result = mysqli_query($connection, $sql);
 
 					$comments = array();
 
+					$comments_count = 0;
+
 					while ($row = mysqli_fetch_assoc($result)) {
 						array_push($comments, $row);
+						$comments_count += 1;
 					}
 
+
+					echo (" 
+						<ul class='collapsible'>
+							<li>
+							<div class='collapsible-header'><i class='material-icons'>comment</i>Comment section ($comments_count comments)</div>
+							<div class='collapsible-body'>
+					");
+
 					foreach ($comments as $comment) {
-						echo $comment['comment_body'];
+						$commenter_user_id = $comment['commenter_user_id'];
+						$comment_body = $comment['comment_body'];
+						$date = date("jS F, Y", strtotime($comment['posted_at']));
+						$time = date("g:ia", strtotime($comment['posted_at']));
+
+						$sql = "SELECT name FROM users WHERE id=$commenter_user_id";
+						$result = mysqli_query($connection, $sql);
+						$row = mysqli_fetch_assoc($result);
+
+						$commenter_user_name = $row['name'];
+
+						$comment_style = "style='padding: 20px; margin: 20px 20px 0px 20px;border-radius: 20px;'";
+
+						// Render comment
+						echo ("
+							<div class='row'>
+								<div class='white z-depth-1' $comment_style>
+									<div class='black-text' style='word-wrap: break-word;'>
+										<span>
+											<a class='tooltipped' data-position='top' data-tooltip='Go to Profile' style='color: inherit;' href='profile.php?user_id=$commenter_user_id'>
+												<b>$commenter_user_name: </b>
+											</a>
+										</span>
+										<span>
+											<p>$comment_body</p>
+										</span>
+									</div>
+									<div>
+										<text style='font-size: 9pt'>
+											<b>Posted at: </b>
+											<text style='color: #90949c'>$date at $time</text>
+										</text>
+									</div>
+								</div>
+							</div>
+						");
 					}
+
+					if (empty($comments)) {
+						echo ("
+							<div class='row'>
+								<div class='white z-depth-1' style='padding: 20px; margin: 20px 20px 0px 20px;border-radius: 20px;'>
+									<div class='center black-text' style='word-wrap: break-word;'>
+										<span>
+											<p>No comments.</p>
+										</span>
+									</div>
+								</div>
+							</div>
+						");
+					}
+
+					$comment_button = "
+						<div class='z-depth-1' style='margin-top: 40px;padding-bottom: 20px;'>
+							<div style='padding: 40px'>
+								<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
+									<div class='input-field'>
+							          <textarea autocomplete='false' name='comment_body' id='comment_textarea' class='materialize-textarea' data-length='256'></textarea>
+							          <label for='comment_textarea'>Your comment</label>
+							        </div>
+
+							        <button class='right btn waves-effect btn' type='submit' name='comment' id='comment_submit'>
+									    <i class='material-icons left'>add_comment</i>Comment
+									</button>
+								</form>
+							</div>
+						</div>
+					";
+
+					echo("</div></li></ul>$comment_button</div></div>");
 				}
 
 				if (empty($posts)) {
@@ -272,32 +352,21 @@ if ($_GET['create_post'] === "success") {
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		$('.tooltipped').tooltip();
 		$('.tabs').tabs();
-		M.textareaAutoResize($('#post_textarea'));
-		$('input#post_title, textarea#post_textarea, textarea#comment_textarea').characterCounter();
+		$('input#post_title, textarea#post_textarea').characterCounter();
 		$('.collapsible').collapsible();
 
-
-		$('#post_title').on("keyup", postCheck);
 		$('#post_textarea').on("keyup", postCheck);
-		$('#comment_textarea').on("keyup", commentCheck);
 
 		function postCheck() {
-		   if($('#post_title').val().length > 0 && $('#post_textarea').val().length > 0) {
+		   if($('#post_textarea').val().length > 0) {
 		      $('#post_submit').prop("disabled", false);
 		   }else {
 		      $('#post_submit').prop("disabled", true);
 		   }
 		}
-
-		function commentCheck() {
-		   if($('#comment_textarea').val().length > 0) {
-		      $('#comment_submit').prop("disabled", false);
-		   }else {
-		      $('#comment_submit').prop("disabled", true);
-		   }
-		}
 	});
 </script>
 <?php
-// require($root_dir . '/fragments/footer.php');
+require($root_dir . '/fragments/footer.php');

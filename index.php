@@ -29,14 +29,6 @@ render_navbar("Home");
 			</script>
 			<?php
 		}
-
-		if ($_GET['login'] === "success") {
-			?>
-			<script type="text/javascript">
-				M.toast({html: 'You have been logged in'})
-			</script>
-			<?php
-		}
 		?> 
 	</center>
 </main>
