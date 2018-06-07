@@ -114,6 +114,22 @@ class User {
 		");
 	}
 
+	public function deletePost(int $post_id) {
+		$connection = Database::getConnection();
+		$sql = "DELETE FROM comments WHERE post_id=$post_id AND commenter_user_id=" . $this->id;
+		mysqli_query($connection, $sql);
+		$sql = "DELETE FROM posts WHERE id=$post_id AND poster_user_id=" . $this->id;
+		mysqli_query($connection, $sql);
+		$connection->close();
+
+		$user_id = $this->id;
+		echo ("
+			<script type='text/javascript'> 
+				window.location.href='../profile.php?user_id=$user_id&delete_post=success';
+			</script>
+		");
+	}
+
 	public function likePost(int $post_id) {
 		$connection = Database::getConnection();
 		$liker_user_id = $this->id;

@@ -42,27 +42,36 @@ class Post {
 		$poster_user_id = $this->poster_user->getID();
 		$poster_user_name = $this->poster_user->getName();
 
-		$like_button = Post::getLikeButton($user->getID(), $liker_user_id, $post_id, $likes);
+		$like_button = Post::getLikeButton($user->getID(), $active_user->getID(), $post_id, $likes);
 		$comment_button = $this->getCommentButton();
 
 		$comments = $this->getComments();
 		$comments_count = count($comments);
 
+		$active_user_id = $active_user->getID();
+
 		// Render Post
-		echo("
+		echo ("
 			<div class='row'>
-				<div class='container white z-depth-2' style='position: relative; padding: 30px; margin: 0 0 30px 10px'>
+				<div class='white z-depth-2' style='position: relative; padding: 30px; margin: 0 10px 30px 10px'>
+		");
+		if ($poster_user_id === $active_user->getID()) {
+			echo ("
 					<!-- Delete Floating Button -->
 					<ul id='dropdown1' class='dropdown-content'>
-						<li>
-							<a href='#'' onclick='$(this).closest('form').submit()'>Delete</a>
-						</li>
+						<form action='profile.php?user_id=$active_user_id&delete_post_id=$post_id' method='POST'>
+							<button class='btn waves-effect waves-light btn' type='submit' name='delete_post'>
+								Delete<i class='material-icons right'>send</i>
+							</button>
+						</form>
 					</ul>
 					
-					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' href='#' data-target='dropdown1'>
+					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown1'>
 						<i class='black-text material-icons'>more_vert</i>
 					</button>
-
+			");
+		}
+		echo ("
 					<!-- Post -->
 					<span class='black-text'>
 						<a style='color: inherit;' href='profile.php?user_id=$poster_user_id'><h5><b>$poster_user_name</b></h5></a>

@@ -23,6 +23,14 @@ if ($_GET['create_post'] === "success") {
 	<?php
 }
 
+if ($_GET['delete_post'] === "success") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'Your post has been created'})
+	</script>
+	<?php
+}
+
 if ($_GET['login'] === "success") {
 	?>
 	<script type="text/javascript">
@@ -43,16 +51,13 @@ if ($_GET['login'] === "success") {
 	<div class="z-depth-2" id="banner">
 		<img src="assets/img/default-profile-banner.jpg" alt="banner-img" id="banner-image">
 	</div>
-	<div id="profile-picture">
-		<img src="assets/img/default-profile-picture.jpg" alt="" id="banner-image" class="circle responsive-img">	
-	</div>
 
 	<div class="row" style="margin-bottom: 10px">
 		<div class="col s12">
 			<ul class="tabs z-depth-1">
-				<li class="col s4" style="margin-right: 10px"></li>
+				<li class="col s3"></li>
 				<li class="tab col s2"><a class="active" href="#timeline">Timeline</a></li>
-				<li class="tab col s2"><a href="#followers">Followers</a></li>
+				<li class="tab col s2"><a href="#followers">Followers (<?php echo count($user->getFollowersArray()) ?>)</a></li>
 				<li class="tab col s2"><a href="#statistics">Statistics</a></li>
 			</ul>
 		</div>
@@ -61,11 +66,11 @@ if ($_GET['login'] === "success") {
 	<div class="row">
 		<div id="timeline" class="col s12">
 			<?php render_profile_info($user, $following) ?>
-			<div class="col s8">
+			<div class="col s6">
 				<!-- Post Form -->
 				<?php if ($_SESSION['user_id'] === $user->getID()): ?>
-					<div class='row'>
-						<div class="hoverable container white" style="margin-left: 10px">
+					<div class='row' style="margin-bottom: 10px;">
+						<div class="hoverable white" style="margin: 0 10px 0 10px">
 							<ul class="collapsible" style="margin: 0;">
 								<li>
 									<div class="collapsible-header"><i class="material-icons">forum</i><b>Create a Post</b></div>
@@ -102,7 +107,7 @@ if ($_GET['login'] === "success") {
 				if (empty($posts)) {
 					echo ("
 						<div class='row'>
-							<div class='white container z-depth-2' style='padding: 20px; margin: 0 0 -10px 10px;'>
+							<div class='white z-depth-2' style='padding: 20px; margin: 0 10px -10px 10px;'>
 								<span class='black-text'>
 									<h5>No Posts.</h5>
 								</span>
@@ -118,7 +123,7 @@ if ($_GET['login'] === "success") {
 			<?php render_profile_info($user, $following) ?>
 
 			<!-- Following -->
-			<div class="col s8">
+			<div class="col s6">
 				<?php
 				$nofollowers = true;
 
@@ -134,17 +139,21 @@ if ($_GET['login'] === "success") {
 					$follow_date = date("jS F, Y", strtotime($follower[1]));
 					$follow_time = date("g:ia", strtotime($follower[1]));
 					$follower_name = $row['name'];
+					$user_name = $user->getName();
 
 					echo ("
 						<div class='row'>
-							<div class='white container z-depth-2' style='padding: 4px 20px 20px 20px; margin: 0 0 -10px 10px;'>
+							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 0 -10px 10px;'>
 								<span class='black-text'>
-									<h5 style='padding: 0'>
-										<a href='profile.php?user_id=$follower_id'>$follower_name</a>
-										started following $user_name
-									</h5>
-
-									<b>Date: </b><text style='color: #90949c'>$follow_date $follow_time</text>
+									<div>
+										<text style='font-size: 12pt'>
+											<a href='profile.php?user_id=$follower_id'>$follower_name</a>
+											started following $user_name
+										</text>
+									</div>
+									<div  style='font-size: 9pt'>
+										<b>Date: </b><text style='color: #90949c'>$follow_date $follow_time</text>
+									</div>
 								</span>
 							</div>
 						</div>
@@ -154,9 +163,13 @@ if ($_GET['login'] === "success") {
 				if ($nofollowers) {
 					echo ("
 						<div class='row'>
-							<div class='white container z-depth-2' style='padding: 20px; margin: 0 0 -10px 10px;'>
+							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 0 -10px 10px;'>
 								<span class='black-text'>
-									<h5>No followers.</h5>
+									<div>
+										<text style='font-size: 12pt'>
+											No Followers
+										</text>
+									</div>
 								</span>
 							</div>
 						</div>
