@@ -12,8 +12,8 @@ $following = User::isFollowing($user, $active_user);
 require($root_dir . '/fragments/head.php');
 require($root_dir . '/fragments/navbar.php');
 
-render_head("Home");
-render_navbar("Home");
+render_head("Profile");
+render_navbar("Profile");
 
 if ($_GET['create_post'] === "success") {
 	?>
@@ -26,7 +26,7 @@ if ($_GET['create_post'] === "success") {
 if ($_GET['delete_post'] === "success") {
 	?>
 	<script type="text/javascript">
-		M.toast({html: 'Your post has been created'})
+		M.toast({html: 'Your post has been deleted'})
 	</script>
 	<?php
 }
@@ -37,6 +37,14 @@ if ($_GET['login'] === "success") {
 		M.toast({html: 'You have been logged in'})
 	</script>
 	<?php
+}
+
+if ($_GET['commented'] === "success") {
+	echo ("
+		<script type='text/javascript'> 
+			window.location.href='profile.php?user_id=" . $_GET['user_id'] . "';
+		</script>
+	");
 }
 ?>
 <link rel="stylesheet" href="assets/css/profile.css">
@@ -107,9 +115,13 @@ if ($_GET['login'] === "success") {
 				if (empty($posts)) {
 					echo ("
 						<div class='row'>
-							<div class='white z-depth-2' style='padding: 20px; margin: 0 10px -10px 10px;'>
+							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 0 -10px 10px;'>
 								<span class='black-text'>
-									<h5>No Posts.</h5>
+									<div>
+										<text style='font-size: 12pt'>
+											No Posts
+										</text>
+									</div>
 								</span>
 							</div>
 						</div>
@@ -141,6 +153,10 @@ if ($_GET['login'] === "success") {
 					$follower_name = $row['name'];
 					$user_name = $user->getName();
 
+					if ($user->getID() === $_SESSION['user_id']) {
+						$user_name = "you";
+					}
+
 					echo ("
 						<div class='row'>
 							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 0 -10px 10px;'>
@@ -148,7 +164,7 @@ if ($_GET['login'] === "success") {
 									<div>
 										<text style='font-size: 12pt'>
 											<a href='profile.php?user_id=$follower_id'>$follower_name</a>
-											started following $user_name
+											started following $user_name.
 										</text>
 									</div>
 									<div  style='font-size: 9pt'>

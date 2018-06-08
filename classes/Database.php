@@ -1,5 +1,4 @@
 <?php class Database {
-
 	private static $server = "localhost";
 	private static $username = "lishan";
 	private static $password = "067699";

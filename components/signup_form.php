@@ -1,7 +1,30 @@
+<style type="text/css" media="screen">
+	.tabs .tab a,
+.tabs .tab.disabled a,
+.tabs .tab.disabled a:hover {
+  color: #00695c;
+}
+
+.tabs .tab a {
+  color: #26a69a;
+}
+
+.tabs .tab a:focus, .tabs .tab a:focus.active {
+  background-color: rgba(0, 137, 123, 0.05);
+}
+
+.tabs .tab a:hover, .tabs .tab a.active {
+  color: #00695c;
+}
+
+.tabs .indicator {
+  background-color: #004d40;
+}
+</style>
 <div class="container z-depth-5" style="width: 40%; margin: 20px 0 20px 0; padding: 40px;">
 	<h4 style="margin-bottom: 25px;">Create an account</h4>
 	<div class="row" style="margin-bottom: 40px;">
-		<div class="col s12 z-depth-1 hoverable" style="padding: 0;">
+		<div class="col s12 z-depth-1" style="padding: 0;">
 			<ul class="tabs">
 				<li class="tab col s6"><a href="#donator" class="teal-text text-darken-4">Donator</a></li>
 				<li class="tab col s6"><a href="#organisation" class="teal-text text-darken-4">Organisation</a></li>

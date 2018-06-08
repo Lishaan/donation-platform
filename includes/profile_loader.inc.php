@@ -71,7 +71,7 @@ if (isset($_GET['user_id'])) {
 }
 
 function render_profile_info(User $user, $following) {
-	$bio_desc = "Desc";
+	$bio_desc = "Description";
 	
 	if ($user->getType() === 'D') {
 		$bio_desc = "Bio";
@@ -81,7 +81,7 @@ function render_profile_info(User $user, $following) {
 	$user_name = $user->getName();
 
 	echo ("
-		<div class='col s3 white z-depth-2'>
+		<div class='col s3 white z-depth-2' style='margin-bottom: 20%'>
 			<div id='profile-picture'>
 				<img src='assets/img/default-profile-picture.jpg' id='banner-image' class='circle responsive-img'>	
 			</div>
@@ -96,7 +96,7 @@ function render_profile_info(User $user, $following) {
 					<button class='btn waves-effect waves-light' style='margin-top: 40px;' type='submit' name='unfollow' value='Unfollow'>Unfollow<i class='material-icons right'>person_outline</i>
 				  	</button>
 		");
-	} else if ($_SESSION['user_id'] !== $user_id) {
+	} else if (!$following and $_SESSION['user_id'] !== $user_id) {
 		echo ("
 					<button class='btn waves-effect waves-light' style='margin-top: 40px;' type='submit' name='follow' value='Follow'>Follow<i class='material-icons right'>person_add</i>
 					</button>

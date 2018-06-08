@@ -3,10 +3,10 @@
 require($root_dir . '/classes/Post.php');
 
 class User {
-	private $id = 0;
-	private $name = "def";
-	private $email = "def";
-	private $type = "def";
+	private $id;
+	private $name;
+	private $email;
+	private $type;
 	
 	public function __construct(int $user_id) {
 		$connection = Database::getConnection();

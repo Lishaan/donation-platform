@@ -43,7 +43,7 @@ class Post {
 		$poster_user_name = $this->poster_user->getName();
 
 		$like_button = Post::getLikeButton($user->getID(), $active_user->getID(), $post_id, $likes);
-		$comment_button = $this->getCommentButton();
+		$comment_button = $this->getCommentButton($user->getID());
 
 		$comments = $this->getComments();
 		$comments_count = count($comments);
@@ -147,11 +147,11 @@ class Post {
 		return $comments;
 	}
 
-	public function getCommentButton() {
+	public function getCommentButton($user_id) {
 		return sprintf("
 			<div class='z-depth-1' style='margin-top: 40px;padding-bottom: 20px;'>
 				<div style='padding: 40px'>
-					<form action='profile.php?user_id=%d&post_id=$post_id' method='POST'>
+					<form action='profile.php?user_id=%d&post_id=%d&commented=success' method='POST'>
 						<div class='input-field'>
 				          <textarea autocomplete='false' name='comment_body' id='comment_textarea' class='materialize-textarea' data-length='256'></textarea>
 				          <label for='comment_textarea'>Your comment</label>
@@ -163,7 +163,7 @@ class Post {
 					</form>
 				</div>
 			</div>
-		", $this->id);
+		", $user_id, $this->id);
 	}
 
 	public static function getLikeButton($user_id, $liker_user_id, $post_id, $likes) {
