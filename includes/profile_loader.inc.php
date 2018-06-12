@@ -1,91 +1,44 @@
 <?php
+$root_dir = $_SERVER["DOCUMENT_ROOT"];
+
+require($root_dir . '/includes/dbh.inc.php');
+require($root_dir . '/classes/User.php');
+
 if (isset($_GET['user_id'])) {
-	$sql = "SELECT * FROM users WHERE id = '" . $_GET['user_id'] . "'";
-	$result = mysqli_query($connection, $sql);
 
-	$row = mysqli_fetch_assoc($result);
-	$user_id = $row['id'];
-	$user_name = $row['name'];
-	$user_type = $row['type'];
+	$user = new User((int) $_GET['user_id']);
+	$active_user = new User((int) $_SESSION['user_id']);
 
-	if (mysqli_num_rows($result) > 0) {
-		$follower_user_id = $_SESSION['user_id'];
-		$sql = "SELECT follower_user_id FROM followers WHERE follower_user_id=$follower_user_id AND user_id=$user_id";
-		$result = mysqli_query($connection, $sql);
-
-		if (mysqli_num_rows($result) > 0) {
-			$following = true;
-		}
+	if (User::exists($user)) {
+		$following = User::isFollowing($user, $active_user);
 
 		// If user clicks follow button
 		if (isset($_POST['follow'])) {
 			if (!$following) {
-				$follower_user_id = $_SESSION['user_id'];
-
-				$sql = "INSERT INTO followers (user_id, follower_user_id, follow_date) VALUES ($user_id, $follower_user_id, now())";
-				mysqli_query($connection, $sql);
-
-				echo ("
-					<script type='text/javascript'> 
-					window.location.href='../profile.php?user_id=$user_id';
-					</script>
-				");
+				$active_user->follow($user);
 			}
 		}
 
 		// If user clicks unfollow button
 		if (isset($_POST['unfollow'])) {
 			if ($following) {
-				$follower_user_id = $_SESSION['user_id'];
-
-				$sql = "DELETE FROM followers WHERE user_id=$user_id AND follower_user_id=$follower_user_id";
-				mysqli_query($connection, $sql);
-
-				echo ("
-					<script type='text/javascript'> 
-						window.location.href='../profile.php?user_id=$user_id';
-					</script>
-				");
+				$active_user->unfollow($user);
 			}
 		}
 
 		// Submit post
 		if (isset($_POST['submit_post'])) {
-			$poster_user_id = mysqli_real_escape_string($connection, $_SESSION['user_id']);
-			$title = mysqli_real_escape_string($connection, $_POST['title']);
-			$body = mysqli_real_escape_string($connection, $_POST['body']);
+			$active_user->createPost($_POST['title'], $_POST['body']);
+		}
 
-			$sql = "INSERT INTO posts (poster_user_id, posted_at, likes, title, body) VALUES ($poster_user_id, now(), 0, '$title', '$body')";
-			mysqli_query($connection, $sql);
-
-			echo ("
-				<script type='text/javascript'> 
-					window.location.href='../profile.php?user_id=$user_id&create_post=success';
-				</script>
-			");
+		// Delete post
+		if (isset($_POST['delete_post'])) {
+			$active_user->deletePost((int) $_GET['delete_post_id']);
 		}
 
 		// Submit like
 		if (isset($_POST['like'])) {
-			$post_id = $_GET['post_id'];
-			$liker_user_id = $_SESSION['user_id'];
-
-			$sql = "SELECT * FROM posts_likes WHERE post_id=$post_id AND user_id=$liker_user_id";
-			$result = mysqli_query($connection, $sql);
-
-			if (mysqli_num_rows($result) <= 0) {
-				$sql = "UPDATE posts SET likes=likes+1 WHERE id=" . $_GET['post_id'];
-				mysqli_query($connection, $sql);
-
-				$sql = "INSERT INTO posts_likes (post_id, user_id) VALUES ($post_id, $liker_user_id)";
-				mysqli_query($connection, $sql);
-			} else {
-				$sql = "UPDATE posts SET likes=likes-1 WHERE id=" . $_GET['post_id'];
-				mysqli_query($connection, $sql);
-
-				$sql = "DELETE FROM posts_likes WHERE post_id=$post_id AND user_id=$liker_user_id";
-				mysqli_query($connection, $sql);
-			}
+			$active_user->likePost((int) $_GET['post_id']);
 		}
 
 		// Submit Comment
@@ -107,12 +60,51 @@ if (isset($_GET['user_id'])) {
 			<script type='text/javascript'> 
 				window.location.href='../index.php';
 			</script>
-			");
+		");
 	}
 } else {
 	echo ("
 		<script type='text/javascript'> 
 			window.location.href='../index.php';
 		</script>
+	");
+}
+
+function render_profile_info(User $user, $following) {
+	$bio_desc = "Description";
+	
+	if ($user->getType() === 'D') {
+		$bio_desc = "Bio";
+	}
+
+	$user_id = $user->getID();
+	$user_name = $user->getName();
+
+	echo ("
+		<div class='col s3 white z-depth-2' style='margin-bottom: 20%'>
+			<div id='profile-picture'>
+				<img src='assets/img/default-profile-picture.jpg' id='banner-image' class='circle responsive-img'>	
+			</div>
+			<div style='padding: 20px; padding-top: 40px'>
+				<h4>$user_name</h4>
+				<p><b>$bio_desc: </b>Aenean eu ipsum vestibulum, congue ipsum sit amet, bibendum sem.</p>
+				<!-- Follow Button -->
+				<form action='../profile.php?user_id=$user_id' method='POST' accept-charset='utf-8'>
+	");
+	if ($following and $_SESSION['user_id'] !== $user_id) {
+		echo ("
+					<button class='btn waves-effect waves-light' style='margin-top: 40px;' type='submit' name='unfollow' value='Unfollow'>Unfollow<i class='material-icons right'>person_outline</i>
+				  	</button>
 		");
+	} else if (!$following and $_SESSION['user_id'] !== $user_id) {
+		echo ("
+					<button class='btn waves-effect waves-light' style='margin-top: 40px;' type='submit' name='follow' value='Follow'>Follow<i class='material-icons right'>person_add</i>
+					</button>
+		");
+	}
+	echo ("
+				</form>
+			</div>
+		</div>
+	");
 }

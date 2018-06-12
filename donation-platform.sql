@@ -9,7 +9,21 @@ CREATE TABLE users (
     name varchar(20) NOT NULL,
     email varchar(128) NOT NULL,
     password varchar(128) NOT NULL,
-    type char(1) NOT NULL -- 'D' (Donators) or O (organisations)
+    type char(1) NOT NULL, -- 'D' (Donators) or O (organisations)
+    contact_number varchar(16)
+);
+
+CREATE TABLE donators_info (
+    id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	profile_picture_directory varchar(128),
+	profile_bio varchar(128)
+);
+
+CREATE TABLE organisations_info (
+	id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	profile_picture_directory varchar(128),
+	profile_description varchar(128),
+	category varchar(128)
 );
 
 CREATE TABLE followers (

@@ -4,7 +4,6 @@ $username = "lishan";
 $password = "067699";
 $database = "donation-platform";
 
-
 $connection = mysqli_connect($server, $username, $password, $database);
 
 if (!$connection){

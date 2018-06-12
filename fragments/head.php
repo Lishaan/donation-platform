@@ -1,4 +1,4 @@
-<?php function render_head($title = "No Title") { ?>
+<?php function render_head($title) { ?>
 
 <!DOCTYPE html>
 <html>
