@@ -1,60 +1,34 @@
 <?php $root_dir = $_SERVER["DOCUMENT_ROOT"];
 session_start();
+require($root_dir . '/includes/dbh.inc.php');
 
 $user;
 $active_user;
-
-require($root_dir . '/includes/dbh.inc.php');
-require($root_dir . '/includes/profile_loader.inc.php');
+require($root_dir . '/includes/profile_loader.inc.php'); // Initializes $user and #active_user
+require($root_dir . '/fragments/edit_profile.php');
 
 $following = User::isFollowing($user, $active_user);
+$edit_profile = $_GET['edit-profile'] === "true";
 
 require($root_dir . '/fragments/head.php');
 require($root_dir . '/fragments/navbar.php');
 
-render_head("Profile");
-render_navbar("Profile");
-
-if ($_GET['create_post'] === "success") {
-	?>
-	<script type="text/javascript">
-		M.toast({html: 'Your post has been created'})
-	</script>
-	<?php
-}
-
-if ($_GET['delete_post'] === "success") {
-	?>
-	<script type="text/javascript">
-		M.toast({html: 'Your post has been deleted'})
-	</script>
-	<?php
-}
-
-if ($_GET['login'] === "success") {
-	?>
-	<script type="text/javascript">
-		M.toast({html: 'You have been logged in'})
-	</script>
-	<?php
-}
-
-if ($_GET['commented'] === "success") {
-	echo ("
-		<script type='text/javascript'> 
-			window.location.href='profile.php?user_id=" . $_GET['user_id'] . "';
-		</script>
-	");
-}
+render_head("Profile - " . $user->getName());
+render_navbar("Profile - " . $user->getName());
 ?>
 <link rel="stylesheet" href="assets/css/profile.css">
+
+<?php if ($edit_profile and $_SESSION['user_id'] === $user->getID()): ?>
+<main>
+	<?php render_edit_profile($active_user); ?>
+</main>
+<?php else: ?>
 <main>
 	<?php if ($_SESSION['user_id'] === $user->getID()): ?>
 		<div style="background-color: #00695c;">
 			<p class="center white-text" style="margin: 0; padding: 10px 0 10px 0;">Viewing your profile</p>
 		</div>
 	<?php endif; ?>
-
 
 	<div class="z-depth-2" id="banner">
 		<img src="assets/img/default-profile-banner.jpg" alt="banner-img" id="banner-image">
@@ -70,18 +44,19 @@ if ($_GET['commented'] === "success") {
 			</ul>
 		</div>
 	</div>
-		<!-- Timeline -->
+
+	<!-- Timeline -->
 	<div class="row">
 		<div id="timeline" class="col s12">
 			<?php render_profile_info($user, $following) ?>
 			<div class="col s6">
 				<!-- Post Form -->
-				<?php if ($_SESSION['user_id'] === $user->getID()): ?>
+				<?php if ($_SESSION['user_id'] === $user->getID() and $user->isDonator()): ?>
 					<div class='row' style="margin-bottom: 10px;">
 						<div class="hoverable white" style="margin: 0 10px 0 10px">
 							<ul class="collapsible" style="margin: 0;">
 								<li>
-									<div class="collapsible-header"><i class="material-icons">forum</i><b>Create a Post</b></div>
+									<div class="waves-effect waves-blue collapsible-header"><i class="material-icons">forum</i><b>Create a Post</b></div>
 									<div class="collapsible-body">
       									<div style="padding: 0 20px 0 20px">
 											<form action="profile.php?user_id=<?php echo $user->getID() ?>" method="POST">
@@ -93,7 +68,6 @@ if ($_GET['commented'] === "success") {
 										          <textarea placeholder="Body" autocomplete="false" name="body" id="post_textarea" class="materialize-textarea" data-length="512"></textarea>
 										          <label for="post_textarea">Body</label>
 										        </div>
-
 										        <button disabled style="margin-top: 20px" class="btn waves-effect waves-light btn-large" type="submit" name="submit_post" id="post_submit">Submit
 												    <i class="material-icons right">send</i>
 												</button>
@@ -104,28 +78,117 @@ if ($_GET['commented'] === "success") {
 							</ul>
 						</div>					
 					</div>
+				<!-- Post/Event Form -->
+				<?php else: ?>
+					<div class='row' style="margin-bottom: 10px;">
+						<div class="hoverable white" style="margin: 0 10px 0 10px">
+							<ul class="collapsible" style="margin: 0px;">
+								<li>
+									<div class="collapsible-header"><i class="material-icons">forum</i><b>Create a Post/Event</b></div>
+									<div class="collapsible-body" style="padding: 40px;">
+      									<div class="z-depth-1" style="padding: 40px">
+	      									<div class="row" style="margin: 0 0 40px 0">	
+	      										<ul class="tabs tabs-fixed-width">
+													<li class="tab col s6"><a class="active" href="#Post">Post</a></li>
+													<li class="tab col s6"><a href="#Event">Event</a></li>
+												</ul>										
+											</div>
+										
+											<div id="Post" >
+												<div style="padding: 0 20px 0 20px">
+													<form action="profile.php?user_id=<?php echo $user->getID() ?>" method="POST">
+														<div class="input-field" style="margin-bottom: 50px">
+											          		<input placeholder="(Optional)" autocomplete="false" name="title" id="post_title" type="text" class="validate" data-length="32">
+											          		<label for="post_title">Title</label>
+											        	</div>
+														<div class="input-field">
+											          		<textarea placeholder="Body" autocomplete="false" name="body" id="post_textarea" class="materialize-textarea" data-length="512"></textarea>
+											          		<label for="post_textarea">Body</label>
+											        	</div>
+
+											        	<button disabled style="margin-top: 20px" class="btn waves-effect waves-light btn-large" type="submit" name="submit_post" id="post_submit">Submit
+													    	<i class="material-icons right">send</i>
+														</button>
+													</form>
+												</div>
+											</div>
+
+											<div id="Event" >
+												<div style="padding: 0 20px 0 20px">
+													<form action="profile.php?user_id=<?php echo $user->getID() ?>" method="POST">
+														<div class="input-field" style="margin-bottom: 50px">
+												          <input placeholder="(Optional)" autocomplete="false" name="title" id="event_title" type="text" class="validate" data-length="32">
+												          <label for="event_title">Title</label>
+												        </div>
+
+														<div class="input-field" style="margin-bottom: 50px">
+												          <textarea placeholder="Required" autocomplete="false" name="body" id="event_textarea" class="materialize-textarea" data-length="512"></textarea>
+												          <label for="event_textarea">Description</label>
+												        </div>
+												        
+												        <div class="input-field">
+													        <input placeholder = "Required" autocomplete="false"  name="fundsNeeded" id="event_funds_Needed" type="number" data-length="11">
+		            										<label for="input_text">Funds Needed</label>
+												        </div>
+														
+												        <button disabled style="margin-top: 20px" class="btn waves-effect waves-light btn-large" type="submit" name="submit_event" id="event_submit">Submit
+														    <i class="material-icons right">send</i>
+														</button>
+													</form>
+												</div>
+											</div>     									
+      									</div>
+									</div>
+								</li>
+							</ul>
+						</div>					
+					</div>
 				<?php endif;
 
-				$posts = $user->getPosts();
+				if ($user->isDonator()) {
+					$posts = $user->getPosts();
 
-				foreach ($posts as $post) {
-					$post->render($user, $active_user);
-				}
+					foreach ($posts as $post) {
+						$post->render($user, $active_user);
+					}
 
-				if (empty($posts)) {
-					echo ("
-						<div class='row'>
-							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 0 -10px 10px;'>
-								<span class='black-text'>
-									<div>
-										<text style='font-size: 12pt'>
-											No Posts
-										</text>
-									</div>
-								</span>
+					if (empty($posts)) {
+						echo ("
+							<div class='row'>
+								<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 10px -10px 10px;'>
+									<span class='black-text'>
+										<div>
+											<text style='font-size: 12pt'>
+												No Posts
+											</text>
+										</div>
+									</span>
+								</div>
 							</div>
-						</div>
-					");
+						");
+					}
+				} else {
+					$posts_and_events = $user->getEventsAndPosts();
+
+					foreach ($posts_and_events as $post_event) {
+						$post_event->render($user, $active_user);
+					}
+
+					if (empty($posts_and_events)) {
+						echo ("
+							<div class='row'>
+								<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 10px -10px 10px;'>
+									<span class='black-text'>
+										<div>
+											<text style='font-size: 12pt'>
+												No Posts or Events
+											</text>
+										</div>
+									</span>
+								</div>
+							</div>
+						");
+					}
 				}
 				?>
 			</div>
@@ -157,9 +220,10 @@ if ($_GET['commented'] === "success") {
 						$user_name = "you";
 					}
 
+					$followers_style = "style='padding: 20px 20px 20px 20px; margin: 0 10px -10px 10px;'";
 					echo ("
 						<div class='row'>
-							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 0 -10px 10px;'>
+							<div class='white z-depth-2' $followers_style>
 								<span class='black-text'>
 									<div>
 										<text style='font-size: 12pt'>
@@ -179,7 +243,7 @@ if ($_GET['commented'] === "success") {
 				if ($nofollowers) {
 					echo ("
 						<div class='row'>
-							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 0 -10px 10px;'>
+							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 10px -10px 10px;'>
 								<span class='black-text'>
 									<div>
 										<text style='font-size: 12pt'>
@@ -199,15 +263,21 @@ if ($_GET['commented'] === "success") {
 		</div>
 	</div>
 </main>
-
+<?php endif; ?>
 <script type="text/javascript">
 	$(document).ready(function() {
+		$('.sidenav').sidenav();
 		$('.tooltipped').tooltip();
 		$('.tabs').tabs();
+		$('.modal').modal();
 		$('input#post_title, textarea#post_textarea').characterCounter();
 		$('.collapsible').collapsible();
 
 		$('#post_textarea').on("keyup", postCheck);
+		$('#event_textarea').on("keyup", eventCheck);
+		$('#event_funds_Needed').on("keyup", eventCheck);
+
+		$('.tabs').tabs('updateTabIndicator');
 
 		function postCheck() {
 		   if($('#post_textarea').val().length > 0) {
@@ -215,7 +285,15 @@ if ($_GET['commented'] === "success") {
 		   }else {
 		      $('#post_submit').prop("disabled", true);
 		   }
-		}
+		};
+
+		function eventCheck() {
+			if($('#event_textarea').val().length > 0 && $('#event_funds_Needed').val().length > 0) {
+		      $('#event_submit').prop("disabled", false);
+		   }else {
+		      $('#event_submit').prop("disabled", true);
+		   }
+		};
 	});
 </script>
 <?php

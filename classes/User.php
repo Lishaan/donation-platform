@@ -1,12 +1,17 @@
 <?php $root_dir = $_SERVER["DOCUMENT_ROOT"];
 
+require($root_dir . '/classes/Database.php');
+require($root_dir . '/classes/Comment.php');
 require($root_dir . '/classes/Post.php');
+require($root_dir . '/classes/Event.php');
 
 class User {
 	private $id;
 	private $name;
 	private $email;
 	private $type;
+
+	// private $biodesc;
 	
 	public function __construct(int $user_id) {
 		$connection = Database::getConnection();
@@ -100,6 +105,62 @@ class User {
 		return $posts;
 	}
 
+	public function getEventsAndPosts() {
+		$connection = Database::getConnection();
+		$sql = sprintf("SELECT * FROM ( (SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id=%d ORDER BY posted_at DESC", $this->getID());
+		
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		$eventsAndPosts = array();
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			if ($row['fundsNeeded']) {
+				$event = new Event((int) $row['id']);
+				array_push($eventsAndPosts, $event);
+
+			} else {
+				$post = new Post((int) $row['id']);
+				array_push($eventsAndPosts, $post);
+			}			
+		}
+
+		return $eventsAndPosts;
+	}
+
+	public function getEventsAndPostsArray() {
+		$connection = Database::getConnection();
+		$sql = sprintf("SELECT * FROM ( (SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id=%d ORDER BY posted_at DESC", $this->getID());
+		
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		$eventsAndPosts = array();
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			array_push($eventsAndPosts, $row);
+		}
+
+		return $eventsAndPosts;
+	}
+
+	public function getEvents() {
+		$connection = Database::getConnection();
+		$sql = sprintf("SELECT * FROM events WHERE poster_user_id=%d ORDER BY posted_at DESC", $this->getID());
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		$events = array();
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			$event = new Event((int) $row['id']);
+
+			array_push($events, $event);
+		}
+
+		return $events;
+	}
+
 	public function createPost(string $title, string $body) {
 		$connection = Database::getConnection();
 		$sql = sprintf("INSERT INTO posts (poster_user_id, posted_at, likes, title, body) VALUES (%d, now(), 0, '%s', '%s')", $this->id, mysqli_real_escape_string($connection, $title), mysqli_real_escape_string($connection, $body));
@@ -116,10 +177,13 @@ class User {
 
 	public function deletePost(int $post_id) {
 		$connection = Database::getConnection();
-		$sql = "DELETE FROM comments WHERE post_id=$post_id AND commenter_user_id=" . $this->id;
+		$sql = "DELETE FROM comments WHERE post_id=$post_id";
 		mysqli_query($connection, $sql);
-		$sql = "DELETE FROM posts WHERE id=$post_id AND poster_user_id=" . $this->id;
+		$sql = "DELETE FROM posts_likes WHERE post_id=$post_id";
 		mysqli_query($connection, $sql);
+		$sql = "DELETE FROM posts WHERE id=$post_id";
+		mysqli_query($connection, $sql);
+
 		$connection->close();
 
 		$user_id = $this->id;
@@ -129,6 +193,7 @@ class User {
 			</script>
 		");
 	}
+
 
 	public function likePost(int $post_id) {
 		$connection = Database::getConnection();
@@ -152,10 +217,134 @@ class User {
 		$connection->close();
 	}
 
+	public function createEvent(string $title, string $body, int $fundsNeeded) {
+		$connection = Database::getConnection();
+		$sql = sprintf("INSERT INTO events (poster_user_id, posted_at, pledges, title, body, fundsNeeded, fundsGathered) VALUES (%d, now(), 0, '%s', '%s', %d, 0)", $this->id, mysqli_real_escape_string($connection, $title), mysqli_real_escape_string($connection, $body), $fundsNeeded);
+		mysqli_query($connection, $sql);
+		$connection->close();
+
+		$user_id = $this->id;
+		echo ("
+			<script type='text/javascript'> 
+				window.location.href='../profile.php?user_id=$user_id&create_event=success';
+			</script>
+		");
+	}
+
+	public function deleteEvent(int $event_id) {
+		$connection = Database::getConnection();
+		$sql = "DELETE FROM comments WHERE event_id=$event_id";
+		mysqli_query($connection, $sql);
+		$sql = "DELETE FROM pledges WHERE event_id=$event_id";
+		mysqli_query($connection, $sql);
+		$sql = "DELETE FROM events WHERE id=$event_id";
+		mysqli_query($connection, $sql);
+
+		$connection->close();
+
+		$user_id = $this->id;
+		echo ("
+			<script type='text/javascript'> 
+				window.location.href='../profile.php?user_id=$user_id&delete_event=success';
+			</script>
+		");
+	}
+
+	public function pledgeEvent(int $event_id, float $pledge_amount, int $user_id) {
+		$connection = Database::getConnection();
+		$pledger_user_id = $this->id;
+
+
+		if ($pledge_amount > 0) {
+			$sql = "INSERT INTO pledges (event_id, pledger_user_id, pledge_amount) VALUES ($event_id, $pledger_user_id, $pledge_amount)";
+			mysqli_query($connection, $sql);
+			
+			$sql = "UPDATE events SET pledges=pledges+1 WHERE id=$event_id";
+			mysqli_query($connection, $sql);
+
+			$connection->close();
+			echo ("
+				<script type='text/javascript'> 
+					window.location.href='../profile.php?user_id=$user_id&pledge_event=success';
+				</script>
+			");
+		} else {
+			$connection->close();
+			echo ("
+				<script type='text/javascript'> 
+					window.location.href='../profile.php?user_id=$user_id&pledge_event=failed';
+				</script>
+			");
+		}
+	}
+
+	public function getBioDesc() {
+		if ($this->isDonator()) {
+			$connection = Database::getConnection();
+			$user_id = $this->id;
+			$sql = "SELECT * FROM donators_info WHERE user_id=$user_id";
+			$result = mysqli_query($connection, $sql);
+
+			$row = mysqli_fetch_assoc($result);
+
+			return $row['profile_bio'];
+
+		} else {
+			$connection = Database::getConnection();
+			$user_id = $this->id;
+			$sql = "SELECT * FROM organisations_info WHERE user_id=$user_id";
+			$result = mysqli_query($connection, $sql);
+
+			$row = mysqli_fetch_assoc($result);
+
+			return $row['profile_description'];
+		}
+	}
+
+	public function getCategory() {
+		if (!$this->isDonator()) {
+			$connection = Database::getConnection();
+			$user_id = $this->id;
+			$sql = "SELECT * FROM organisations_info WHERE user_id=$user_id";
+			$result = mysqli_query($connection, $sql);
+
+			$row = mysqli_fetch_assoc($result);
+
+			return $row['profile_description'];
+		} else {
+			return false;
+		}
+	}
+
+	public function getProfilePictureDirectory() {
+		if ($this->isDonator()) {
+			$connection = Database::getConnection();
+			$user_id = $this->id;
+			$sql = "SELECT * FROM donators_info WHERE user_id=$user_id";
+			$result = mysqli_query($connection, $sql);
+
+			$row = mysqli_fetch_assoc($result);
+
+			return $row['profile_picture_directory'];
+
+		} else {
+			$connection = Database::getConnection();
+			$user_id = $this->id;
+			$sql = "SELECT * FROM organisations_info WHERE user_id=$user_id";
+			$result = mysqli_query($connection, $sql);
+
+			$row = mysqli_fetch_assoc($result);
+
+			return $row['profile_picture_directory'];
+		}
+	}
+
 	public function getID() { return $this->id; }
 	public function getName() { return $this->name; }
 	public function getEmail() { return $this->email; }
 	public function getType() { return $this->type; }
+
+	public function isDonator() { return $this->type === "D" ? true : false; }
 
 	public static function exists($user) {
 		$connection = Database::getConnection();

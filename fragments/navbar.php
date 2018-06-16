@@ -27,7 +27,7 @@ function render_navbar($activepage) { ?>
 
 						<ul id="dropdown" class="dropdown-content" style="margin-top: 50px">
 							<li><a href="../profile.php?user_id=<?php echo $_SESSION['user_id']; ?>">View Profile</a></li>
-							<li><a href="#!">Edit Profile</a></li>
+							<li><a href="../profile.php?user_id=<?php echo $_SESSION['user_id']; ?>&edit-profile=true">Settings</a></li>
 							<li class="divider"></li>
 							<li><a href="../includes/signout.inc.php">Logout</a></li>
 						</ul>

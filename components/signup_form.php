@@ -1,24 +1,24 @@
 <style type="text/css" media="screen">
-	.tabs .tab a,
+.tabs .tab a,
 .tabs .tab.disabled a,
 .tabs .tab.disabled a:hover {
-  color: #00695c;
+	color: #00695c;
 }
 
 .tabs .tab a {
-  color: #26a69a;
+	color: #26a69a;
 }
 
 .tabs .tab a:focus, .tabs .tab a:focus.active {
-  background-color: rgba(0, 137, 123, 0.05);
+	background-color: rgba(0, 137, 123, 0.05);
 }
 
 .tabs .tab a:hover, .tabs .tab a.active {
-  color: #00695c;
+	color: #00695c;
 }
 
 .tabs .indicator {
-  background-color: #004d40;
+	background-color: #004d40;
 }
 </style>
 <div class="container z-depth-5" style="width: 40%; margin: 20px 0 20px 0; padding: 40px;">
@@ -88,6 +88,20 @@
 						<label for="password"><b>Password</b></label>
 					</div>
 				</div>
+				<div class="row">
+					<div class="input-field col s12 m6">
+						<select name="category" class="icons">
+							<option value="" disabled selected>Choose your option</option>
+							<option value="Pet and Animal Welfare" class="left">Pet and Animal Welfare</option>
+							<option value="Environmental Conservation & Protection" class="left">Environmental Conservation & Protection</option>
+							<option value="Medical Services & Treatment" class="left">Medical Services & Treatment</option>
+							<option value="Scholarship and financial aid services" class="left">Scholarship and financial aid services</option>
+							<option value="Arts & Culture" class="left">Arts & Culture</option>
+							<!-- <option value="" data-icon="images/sample-1.jpg" class="left">example 1</option> -->
+						</select>
+						<label>Category</label>
+					</div>
+				</div>
 				<div style="margin: 10px 0 30px 0"><a href="index.php?form=login">Already have an account? Log in!</a></div>
 				<button class="btn-large waves-effect blue darken-3" type="submit" name="submit">Sign Up
 					<i class="material-icons right">send</i>
@@ -100,5 +114,6 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('.tabs').tabs();
+		$('select').formSelect();
 	});
 </script>

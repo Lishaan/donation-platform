@@ -1,8 +1,5 @@
 <?php $root_dir = $_SERVER["DOCUMENT_ROOT"];
 
-require($root_dir . '/classes/Comment.php');
-require($root_dir . '/classes/Database.php');
-
 class Post {
 	private $id;
 	private $poster_user;
@@ -58,7 +55,7 @@ class Post {
 		if ($poster_user_id === $active_user->getID()) {
 			echo ("
 					<!-- Delete Floating Button -->
-					<ul id='dropdown1' class='dropdown-content'>
+					<ul id='dropdown$post_id$poster_user_id' class='dropdown-content'>
 						<form action='profile.php?user_id=$active_user_id&delete_post_id=$post_id' method='POST'>
 							<button class='btn waves-effect waves-light btn' type='submit' name='delete_post'>
 								Delete<i class='material-icons right'>send</i>
@@ -66,7 +63,7 @@ class Post {
 						</form>
 					</ul>
 					
-					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown1'>
+					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown$post_id$poster_user_id'>
 						<i class='black-text material-icons'>more_vert</i>
 					</button>
 			");
@@ -134,7 +131,7 @@ class Post {
 
 	public function getComments() {
 		$connection = Database::getConnection();
-		$sql = sprintf("SELECT * FROM comments WHERE post_id=%d ORDER BY posted_at ASC;", $this->id);
+		$sql = sprintf("SELECT * FROM comments WHERE post_id=%d ORDER BY posted_at ASC", $this->id);
 		$result = mysqli_query($connection, $sql);
 		$connection->close();
 
@@ -157,7 +154,7 @@ class Post {
 				          <label for='comment_textarea'>Your comment</label>
 				        </div>
 
-				        <button class='right btn waves-effect btn' type='submit' name='comment' id='comment_submit'>
+				        <button class='right btn waves-effect btn' type='submit' name='post_comment' id='comment_submit'>
 						    <i class='material-icons left'>add_comment</i>Comment
 						</button>
 					</form>

@@ -7,7 +7,6 @@ date_default_timezone_set("Asia/Kuala_Lumpur");
 
 include($root_dir . '/includes/dbh.inc.php');
 
-// Donator Sign up
 if (isset($_POST['submit']) and isset($_GET['type'])) {
 	$name = mysqli_real_escape_string($connection, $_POST['name']);
 	$email = mysqli_real_escape_string($connection, $_POST['email']);
@@ -50,6 +49,23 @@ if (isset($_POST['submit']) and isset($_GET['type'])) {
 				// Insert User into database
 				$sql = "INSERT INTO users (name, email, password, type) VALUES ('$name', '$email', '$hashP', '$type')";
 				mysqli_query($connection, $sql);
+
+				$sql = "SELECT id FROM users ORDER BY id DESC LIMIT 1";
+				$result = mysqli_query($connection, $sql);
+
+				$row = mysqli_fetch_assoc($result);
+
+				$user_id = $row['id'];
+				$profile_picture_directory = "assets/img/profile_pictures/default_profile_picture.jpg";
+
+				// User Info
+				if ($type === "D") {
+					$sql = sprintf("INSERT INTO donators_info (user_id, profile_picture_directory, profile_bio) VALUES (%d, '%s', '%s')", $user_id, $profile_picture_directory, "No Bio.");
+					mysqli_query($connection, $sql);
+				} else {
+					$sql = sprintf("INSERT INTO organisations_info (user_id, profile_picture_directory, profile_description, category) VALUES ('%d', '%s', '%s', '%s')", $user_id, "$profile_picture_directory", "No Description.", mysqli_real_escape_string($connection, $_POST['category']));
+					mysqli_query($connection, $sql);
+				}
 
 				echo ("
 					<script type='text/javascript'> 
