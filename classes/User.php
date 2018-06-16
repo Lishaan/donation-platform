@@ -10,8 +10,6 @@ class User {
 	private $name;
 	private $email;
 	private $type;
-
-	// private $biodesc;
 	
 	public function __construct(int $user_id) {
 		$connection = Database::getConnection();
@@ -128,9 +126,9 @@ class User {
 		return $eventsAndPosts;
 	}
 
-	public function getEventsAndPostsArray() {
+	public function getEventsAndPostsFollowing() {
 		$connection = Database::getConnection();
-		$sql = sprintf("SELECT * FROM ( (SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id=%d ORDER BY posted_at DESC", $this->getID());
+		$sql = sprintf("SELECT * FROM ((SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id=%d ORDER BY posted_at DESC", $this->getID());
 		
 		$result = mysqli_query($connection, $sql);
 		$connection->close();
@@ -138,7 +136,14 @@ class User {
 		$eventsAndPosts = array();
 
 		while ($row = mysqli_fetch_assoc($result)) {
-			array_push($eventsAndPosts, $row);
+			if ($row['fundsNeeded']) {
+				$event = new Event((int) $row['id']);
+				array_push($eventsAndPosts, $event);
+
+			} else {
+				$post = new Post((int) $row['id']);
+				array_push($eventsAndPosts, $post);
+			}			
 		}
 
 		return $eventsAndPosts;
@@ -194,7 +199,6 @@ class User {
 		");
 	}
 
-
 	public function likePost(int $post_id) {
 		$connection = Database::getConnection();
 		$liker_user_id = $this->id;
@@ -219,7 +223,7 @@ class User {
 
 	public function createEvent(string $title, string $body, int $fundsNeeded) {
 		$connection = Database::getConnection();
-		$sql = sprintf("INSERT INTO events (poster_user_id, posted_at, pledges, title, body, fundsNeeded, fundsGathered) VALUES (%d, now(), 0, '%s', '%s', %d, 0)", $this->id, mysqli_real_escape_string($connection, $title), mysqli_real_escape_string($connection, $body), $fundsNeeded);
+		$sql = sprintf("INSERT INTO events (poster_user_id, posted_at, likes, title, body, fundsNeeded, fundsGathered) VALUES (%d, now(), 0, '%s', '%s', %d, 0)", $this->id, mysqli_real_escape_string($connection, $title), mysqli_real_escape_string($connection, $body), $fundsNeeded);
 		mysqli_query($connection, $sql);
 		$connection->close();
 
@@ -235,7 +239,9 @@ class User {
 		$connection = Database::getConnection();
 		$sql = "DELETE FROM comments WHERE event_id=$event_id";
 		mysqli_query($connection, $sql);
-		$sql = "DELETE FROM pledges WHERE event_id=$event_id";
+		$sql = "DELETE FROM events_likes WHERE event_id=$event_id";
+		mysqli_query($connection, $sql);
+		$sql = "DELETE FROM events_donations WHERE event_id=$event_id";
 		mysqli_query($connection, $sql);
 		$sql = "DELETE FROM events WHERE id=$event_id";
 		mysqli_query($connection, $sql);
@@ -250,29 +256,54 @@ class User {
 		");
 	}
 
-	public function pledgeEvent(int $event_id, float $pledge_amount, int $user_id) {
+	public function likeEvent(int $event_id) {
 		$connection = Database::getConnection();
-		$pledger_user_id = $this->id;
+		$liker_user_id = $this->id;
+		$sql = "SELECT * FROM events_likes WHERE event_id=$event_id AND user_id=$liker_user_id";
+		$result = mysqli_query($connection, $sql);
 
-
-		if ($pledge_amount > 0) {
-			$sql = "INSERT INTO pledges (event_id, pledger_user_id, pledge_amount) VALUES ($event_id, $pledger_user_id, $pledge_amount)";
+		if (mysqli_num_rows($result) <= 0) {
+			$sql = "UPDATE events SET likes=likes+1 WHERE id=" . $_GET['event_id'];
 			mysqli_query($connection, $sql);
-			
-			$sql = "UPDATE events SET pledges=pledges+1 WHERE id=$event_id";
+
+			$sql = "INSERT INTO events_likes (event_id, user_id) VALUES ($event_id, $liker_user_id)";
+			mysqli_query($connection, $sql);
+		} else {
+			$sql = "UPDATE events SET likes=likes-1 WHERE id=" . $_GET['event_id'];
+			mysqli_query($connection, $sql);
+
+			$sql = "DELETE FROM events_likes WHERE event_id=$event_id AND user_id=$liker_user_id";
+			mysqli_query($connection, $sql);
+		}
+		$connection->close();
+	}
+
+	public function donateEvent(int $event_id, float $donation_amount, int $user_id) {
+		$connection = Database::getConnection();
+		$donator_user_id = $this->id;
+
+		$goback = "";
+
+		if (isset($_GET['goback'])) {
+			$goback = "&goback=" . $_GET['goback'];
+		}
+
+
+		if ($donation_amount > 0) {
+			$sql = "INSERT INTO events_donations (event_id, donator_user_id, donation_amount, donated_at) VALUES ($event_id, $donator_user_id, $donation_amount, now())";
 			mysqli_query($connection, $sql);
 
 			$connection->close();
 			echo ("
 				<script type='text/javascript'> 
-					window.location.href='../profile.php?user_id=$user_id&pledge_event=success';
+					window.location.href='../profile.php?user_id=$user_id&donate_event=success$goback';
 				</script>
 			");
 		} else {
 			$connection->close();
 			echo ("
 				<script type='text/javascript'> 
-					window.location.href='../profile.php?user_id=$user_id&pledge_event=failed';
+					window.location.href='../profile.php?user_id=$user_id&donate_event=failed$goback';
 				</script>
 			");
 		}

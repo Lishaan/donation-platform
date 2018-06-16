@@ -28,7 +28,7 @@ if ($_GET['login'] === "success") {
 	<?php
 }
 
-if ($_GET['commented'] === "success") {
+if ($_GET['commented'] === "success" and !isset($_GET['goback'])) {
 	echo ("
 		<script type='text/javascript'> 
 			window.location.href='profile.php?user_id=" . $_GET['user_id'] . "';
@@ -69,8 +69,13 @@ if (isset($_GET['user_id'])) {
 		}
 
 		// Submit like
-		if (isset($_POST['like'])) {
+		if (isset($_POST['like_post'])) {
 			$active_user->likePost((int) $_GET['post_id']);
+		}
+
+		// Submit like
+		if (isset($_POST['like_event'])) {
+			$active_user->likeEvent((int) $_GET['event_id']);
 		}
 
 		// Submit event
@@ -84,8 +89,8 @@ if (isset($_GET['user_id'])) {
 		}
 
 		// Submit like
-		if (isset($_POST['pledge_button'])) {
-			$active_user->pledgeEvent((int) $_GET['event_id'], (double)$_POST['pledge_amount'], (int) $user->getID());
+		if (isset($_POST['donate_button'])) {
+			$active_user->donateEvent((int) $_GET['event_id'], (double) $_POST['donation_amount'], (int) $user->getID());
 		}
 
 		// Submit Comment
@@ -116,7 +121,6 @@ if (isset($_GET['user_id'])) {
 				mysqli_query($connection, $sql);
 			}
 		}
-
 
 		// Settings -> Edit Profile
 		if (isset($_POST['update_edit_profile'])) {
@@ -227,6 +231,15 @@ if (isset($_GET['user_id'])) {
 	echo ("
 		<script type='text/javascript'> 
 			window.location.href='../index.php';
+		</script>
+	");
+}
+
+if (isset($_GET['goback'])) {
+	$goback = $_GET['goback'];
+	echo ("
+		<script type='text/javascript'> 
+			window.location.href='../$goback.php';
 		</script>
 	");
 }

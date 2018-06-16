@@ -2,7 +2,8 @@ DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS posts_likes;
 DROP TABLE IF EXISTS followers;
 DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS pledges;
+DROP TABLE IF EXISTS events_likes;
+DROP TABLE IF EXISTS events_donations;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS donators_info;
 DROP TABLE IF EXISTS organisations_info;
@@ -81,7 +82,7 @@ CREATE TABLE events (
 	poster_user_id int(11) NOT NULL,
 	posted_at datetime NOT NULL,
 
-	pledges int(11),
+	likes int(11),
 	title varchar(32),
 	body varchar(512) NOT NULL,
 	fundsNeeded int(11) NOT NULL,
@@ -90,14 +91,24 @@ CREATE TABLE events (
 	FOREIGN KEY (poster_user_id) REFERENCES users (id)
 );
 
-CREATE TABLE pledges (
+CREATE TABLE events_likes (
 	id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	event_id int(11) NOT NULL,
-	pledger_user_id int(11) NOT NULL,
-	pledge_amount int(11) NOT NULL,
+	user_id int(11) NOT NULL,
 
 	FOREIGN KEY (event_id) REFERENCES events (id),
-	FOREIGN KEY (pledger_user_id) REFERENCES users (id)
+	FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE events_donations (
+	id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	event_id int(11) NOT NULL,
+	donator_user_id int(11) NOT NULL,
+	donation_amount int(11) NOT NULL,
+	donated_at datetime NOT NULL,
+
+	FOREIGN KEY (event_id) REFERENCES events (id),
+	FOREIGN KEY (donator_user_id) REFERENCES users (id)
 );
 
 INSERT INTO users (id, name, email, password, type) 

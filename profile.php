@@ -79,7 +79,7 @@ render_navbar("Profile - " . $user->getName());
 						</div>					
 					</div>
 				<!-- Post/Event Form -->
-				<?php else: ?>
+				<?php elseif ($_SESSION['user_id'] === $user->getID()): ?>
 					<div class='row' style="margin-bottom: 10px;">
 						<div class="hoverable white" style="margin: 0 10px 0 10px">
 							<ul class="collapsible" style="margin: 0px;">

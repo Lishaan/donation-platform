@@ -28,7 +28,7 @@ class Post {
 		}
 	}
 
-	public function render(User $user, User $active_user) {
+	public function render(User $user, User $active_user, $goback = "") {
 		$post_id = $this->id;
 		$title = $this->title;
 		$body = htmlspecialchars($this->body);
@@ -39,8 +39,8 @@ class Post {
 		$poster_user_id = $this->poster_user->getID();
 		$poster_user_name = $this->poster_user->getName();
 
-		$like_button = Post::getLikeButton($user->getID(), $active_user->getID(), $post_id, $likes);
-		$comment_button = $this->getCommentButton($user->getID());
+		$like_button = Post::getLikeButton($user->getID(), $active_user->getID(), $post_id, $likes, $goback);
+		$comment_button = $this->getCommentButton($user->getID(), $goback);
 
 		$comments = $this->getComments();
 		$comments_count = count($comments);
@@ -52,7 +52,7 @@ class Post {
 			<div class='row'>
 				<div class='white z-depth-2' style='position: relative; padding: 30px; margin: 0 10px 30px 10px'>
 		");
-		if ($poster_user_id === $active_user->getID()) {
+		if ($poster_user_id === $active_user->getID() and empty($goback)) {
 			echo ("
 					<!-- Delete Floating Button -->
 					<ul id='dropdown$post_id$poster_user_id' class='dropdown-content'>
@@ -71,7 +71,9 @@ class Post {
 		echo ("
 					<!-- Post -->
 					<span class='black-text'>
-						<a style='color: inherit;' href='profile.php?user_id=$poster_user_id'><h5><b>$poster_user_name</b></h5></a>
+						<a style='color: inherit;' href='profile.php?user_id=$poster_user_id'>
+							<h5 style='margin-top: 0'><b>$poster_user_name</b></h5>
+						</a>
 						<b>Posted at: </b><text style='color: #90949c'>$date at $time</text>
 						$like_button
 						<div class='z-depth-1' style='margin: 20px 0 20px 0; padding: 10px 20px 10px 20px'>
@@ -144,11 +146,11 @@ class Post {
 		return $comments;
 	}
 
-	public function getCommentButton($user_id) {
+	public function getCommentButton($user_id, $goback = "") {
 		return sprintf("
 			<div class='z-depth-1' style='margin-top: 40px;padding-bottom: 20px;'>
 				<div style='padding: 40px'>
-					<form action='profile.php?user_id=%d&post_id=%d&commented=success' method='POST'>
+					<form action='profile.php?user_id=%d&post_id=%d&commented=success$goback' method='POST'>
 						<div class='input-field'>
 				          <textarea autocomplete='false' name='comment_body' id='comment_textarea' class='materialize-textarea' data-length='256'></textarea>
 				          <label for='comment_textarea'>Your comment</label>
@@ -163,13 +165,13 @@ class Post {
 		", $user_id, $this->id);
 	}
 
-	public static function getLikeButton($user_id, $liker_user_id, $post_id, $likes) {
+	public static function getLikeButton($user_id, $liker_user_id, $post_id, $likes, $goback = "") {
 		session_start();
 
 		$like_button = "
 			<div style='margin-bottom: 20px;'> 
-				<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
-			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like'>$likes
+				<form action='profile.php?user_id=$user_id&post_id=$post_id$goback' method='POST'>
+			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like_post'>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
 					</button>
 				</form>
@@ -179,7 +181,7 @@ class Post {
 		$like_button_disabled = "
 			<div style='margin-bottom: 20px;'> 
 				<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
-			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like' disabled>$likes
+			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like_post' disabled>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
 					</button>
 				</form>
@@ -188,8 +190,8 @@ class Post {
 
 		$unlike_button = "
 			<div style='margin-bottom: 20px;'> 
-				<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
-			        <button style='margin-top: 20px; background-color: #e37375;' class='z-depth-2 btn waves-effect' type='submit' name='like'>$likes
+				<form action='profile.php?user_id=$user_id&post_id=$post_id$goback' method='POST'>
+			        <button style='margin-top: 20px; background-color: #e37375;' class='z-depth-2 btn waves-effect' type='submit' name='like_post'>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_down</i>
 					</button>
 				</form>
@@ -205,9 +207,9 @@ class Post {
 			$like_button = $unlike_button;
 		}
 
-		if ($_SESSION['user_id'] === $user_id) {
-			$like_button = $like_button_disabled;
-		}
+		// if ($_SESSION['user_id'] === $user_id) {
+		// 	$like_button = $like_button_disabled;
+		// }
 
 		return $like_button;
 	}

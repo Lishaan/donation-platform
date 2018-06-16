@@ -5,74 +5,94 @@ $root_dir = $_SERVER["DOCUMENT_ROOT"];
 
 require($root_dir . '/includes/dbh.inc.php');
 
+require($root_dir . '/classes/User.php');
 require($root_dir . '/fragments/head.php');
 require($root_dir . '/fragments/navbar.php');
-require($root_dir . '/fragments/sidebar.php');
-require($root_dir . '/components/event_event.php');
 
-render_head("Feed");
-render_navbar("Feed");
+$active_user = new User((int) $_SESSION['user_id']);
+
+render_head("Feed - " . $active_user->getName());
+render_navbar("Feed - " . $active_user->getName());
 ?>
 
 <link rel="stylesheet" href="assets/css/feed.css">
+<main>
 
-<!--Global and Following Tab -->
-<div class="row" style="padding: 0px; margin-bottom: 50px;">
-	<div class="col s12 center-align" style="outline: 2px solid; padding: 0px;">
-		<ul class="tabs green" style="position: fixed; z-index: 1; width: 100%">
-  			<li class="tab col s3"><a class="active" href="#test1">Global</a></li>
-			<li class="tab col s3"><a href="#test2">Following</a></li>
-		</ul>
+
+	<div class="row" style="margin-bottom: 10px">
+		<div class="col s12">
+			<ul class="tabs z-depth-1">
+				<li class="col s3"></li>
+				<li class="tab col s3"><a class="active" href="#following">Following</a></li>
+				<li class="tab col s3"><a href="#global">Global</a></li>
+				<li class="col s3"></li>
+			</ul>
+		</div>
 	</div>
-</div>
 
-<!--Events and Post Display-->
-<div class="container" >
+	<!-- Following & Global Content -->
 	<div class="row">
-	   	<div id ="test1" class="col s9">
-	   		<?php
-				$id = 0;
-				$imgs = array(
-					"assets/img/sample-2.jpg",
-					"assets/img/sample-5.jpg",
-					"assets/img/tigerEvent.jpg",
-					"assets/img/tigerEvent.jpg",
-					"assets/img/sample-1.jpg"
-				);
-			?>			
-			
-			<?php
-				foreach ($imgs as $img) {
-					$url = "#";
-					$orgName = "Organisation Name";
-					$desc = "Description";
-					$date = "26-January-1997";
+		<div id="following" class="col s12">
+			<!-- Left -->
+			<div class='col s3 white z-depth-2' style='margin-bottom: 20%; padding: 20px'>
+				<h5><b>Useful Links</b></h5>
 
-					render_events_event($id, $url, $img, $date, $desc, $orgName, $img);
+				<ul>
+					<li>• wwf.com.org</li>
+					<li>• aspca.com.org</li>
+					<li>• UNICEF.com.org</li>
+				</ul>
+			</div>
 
-					$id++;								
+			<!-- Center -->
+			<div class="col s6">
+				<?php 
+				// $posts = $active_user->getPosts();
+
+				// foreach ($posts as $post) {
+				// 	$post->render($active_user, $active_user, "&goback=feed");
+				// }
+
+				$posts_and_events = $active_user->getEventsAndPosts();
+
+				foreach ($posts_and_events as $post_event) {
+					$post_event->render($active_user, $active_user, "&goback=feed");
 				}
-			?>   			
-		
-		</div>
 
-		<div id="test2" class="col s9">
-			<H1>Following</H1>
+				if (empty($posts_and_events)) {
+					echo ("
+						<div class='row'>
+							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 10px -10px 10px;'>
+								<span class='black-text'>
+									<div>
+										<text style='font-size: 12pt'>
+											No Posts or Events
+										</text>
+									</div>
+								</span>
+							</div>
+						</div>
+					");
+				}
+				?>
+			</div>
 		</div>
+		<div id="global" class="col s12">
+			<div class='col s3 white z-depth-2' style='margin-bottom: 20%'>
 
-		<div>
-			<?php render_sidebar();?>
+			</div>
 		</div>
 	</div>
-</div>
+</main>
         
 <script type="text/javascript">
  	$(document).ready(function(){
     $('.tabs').tabs();
+    $('.collapsible').collapsible();
+    $('.modal').modal();
   });
      
 </script> 
 
-<?php
+<?php 
 require($root_dir . '/fragments/footer.php');
-       

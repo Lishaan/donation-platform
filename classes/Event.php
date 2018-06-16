@@ -4,11 +4,13 @@ class Event {
 	private $id;
 	private $poster_user;
 	private $posted_at;
-	private $pledges;
+	private $likes;
 	private $title;
 	private $body;
+
 	private $fundsNeeded;
 	private $fundsGathered;
+	private $total_donations;
 
 	public function __construct(int $id) {
 		
@@ -22,53 +24,24 @@ class Event {
 			$this->id = $row['id'];
 			$this->poster_user = new User((int) $row['poster_user_id']);
 			$this->posted_at = $row['posted_at'];
+			$this->likes = $row['likes'];
 			$this->title = $row['title'];
 			$this->body = $row['body'];
 			$this->fundsNeeded = $row['fundsNeeded'];
 			$this->fundsGathered = $this->getFundsGathered();		
-			$this->pledges = $this->getPledges();
+			$this->total_donations = $this->getTotalDonations();
 		} else {
 			die("Event unable to construct");
 		}
 	}
 
-	public function getFundsGathered() {
-		$connection = Database::getConnection();
-		$sql = "SELECT * FROM pledges WHERE event_id=" . $this->id;
-		$result = mysqli_query($connection, $sql);
-		$connection->close();
-
-		$total = 0;
-
-		while ($row = mysqli_fetch_assoc($result)) {
-			$total += (double) $row['pledge_amount'];
-		}
-
-		return $total;
-	}
-
-	public function getPledges() {
-		$connection = Database::getConnection();
-		$sql = "SELECT * FROM pledges WHERE event_id=" . $this->id;
-		$result = mysqli_query($connection, $sql);
-		$connection->close();
-
-		$total = 0;
-
-		while ($row = mysqli_fetch_assoc($result)) {
-			$total++;
-		}
-
-		return $total;
-	}
-
-	public function render(User $user, User $active_user) {
+	public function render(User $user, User $active_user, $goback = "") {
 		$event_id = $this->id;
 		$title = $this->title;
 		$body = htmlspecialchars($this->body);
-		$pledges = $this->pledges;
 		$date = date("jS F, Y", strtotime($this->posted_at));
 		$time = date("g:ia", strtotime($this->posted_at));
+		$total_donations = $this->total_donations;
 
 		$poster_user_id = $this->poster_user->getID();
 		$poster_user_name = $this->poster_user->getName();
@@ -76,8 +49,9 @@ class Event {
 		$fundsNeeded = $this->fundsNeeded;
 		$fundsGathered = $this->fundsGathered;
 
-		$pledge_button = Event::getPledgeButton($user->getID(), $active_user->getID(), $event_id, $pledges, $this->poster_user);
-		$comment_button = $this->getCommentButton($user->getID());
+		$like_button = Event::getLikeButton($user->getID(), $active_user->getID(), $event_id, $this->likes, $goback);
+		$donate_button = Event::getDonateButton($user->getID(), $active_user->getID(), $event_id, $this->poster_user, $goback);
+		$comment_button = $this->getCommentButton($user->getID(), $goback);
 
 		$comments = $this->getComments();
 		$comments_count = count($comments);
@@ -92,7 +66,7 @@ class Event {
 		");
 
 		
-		if ($poster_user_id === $active_user->getID()) {
+		if ($poster_user_id === $active_user->getID() and empty($goback)) {
 			
 			echo ("
 					<!-- Delete Floating Button -->
@@ -116,16 +90,16 @@ class Event {
 					<span class='black-text'>
 						<a style='color: inherit;' href='profile.php?user_id=$poster_user_id'><h5><b>Event by $poster_user_name</b></h5></a>
 						<b>Posted at: </b><text style='color: #90949c'>$date at $time</text>
-						<br>
+						$like_button
 						<div class='z-depth-1' style='margin: 20px 0 20px 0; padding: 10px 20px 10px 20px'>
 							<p style='font-size: 14pt; line-height: 5px;'><b>$title</b></p>
 							<p>$body</p>
 						</div>
 						<div class='z-depth-1' style='padding: 10px 20px 10px 20px; margin: 20px 0 20px 0'>
-							<p>Total Pledges: $pledges</p>
-							<p>Funds Needed: $fundsNeeded</p>
-							<p>Funds Gathered: $fundsGathered</p>
-							<div class='center'>$pledge_button</div>
+							<p>Total Donations: $total_donations</p>
+							<p>Funds Needed: RM$fundsNeeded</p>
+							<p>Funds Gathered: RM$fundsGathered</p>
+							<div class='center'>$donate_button</div>
 						</div>
 					</span>
 
@@ -165,6 +139,36 @@ class Event {
 		");
 	}
 
+	public function getFundsGathered() {
+		$connection = Database::getConnection();
+		$sql = "SELECT * FROM events_donations WHERE event_id=" . $this->id;
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		$total = 0;
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			$total += (double) $row['donation_amount'];
+		}
+
+		return $total;
+	}
+
+	public function getTotalDonations() {
+		$connection = Database::getConnection();
+		$sql = "SELECT * FROM events_donations WHERE event_id=" . $this->id;
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		$total = 0;
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			$total++;
+		}
+
+		return $total;
+	}
+
 	public function getComments() {
 		$connection = Database::getConnection();
 		$sql = sprintf("SELECT * FROM comments WHERE event_id=%d ORDER BY posted_at ASC", $this->id);
@@ -181,11 +185,11 @@ class Event {
 	}
 
 	
-	public function getCommentButton($user_id) {
+	public function getCommentButton($user_id, $goback = "") {
 		return sprintf("
 			<div class='z-depth-1' style='margin-top: 40px;padding-bottom: 20px;'>
 				<div style='padding: 40px'>
-					<form action='profile.php?user_id=%d&event_id=%d&commented=success' method='POST'>
+					<form action='profile.php?user_id=%d&event_id=%d&commented=success$goback' method='POST'>
 						<div class='input-field'>
 				          <textarea autocomplete='false' name='comment_body' id='comment_textarea' class='materialize-textarea' data-length='256'></textarea>
 				          <label for='comment_textarea'>Your comment</label>
@@ -200,7 +204,56 @@ class Event {
 		", $user_id, $this->id);
 	}
 
-	public static function getPledgeButton($user_id, $pledger_user_id, $event_id, $total_pledges, $poster_user) {
+	public static function getLikeButton($user_id, $liker_user_id, $event_id, $likes, $goback = "") {
+		session_start();
+
+		$like_button = "
+			<div style='margin-bottom: 20px;'> 
+				<form action='profile.php?user_id=$user_id&event_id=$event_id$goback' method='POST'>
+			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like_event'>$likes
+						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
+					</button>
+				</form>
+			</div>
+		";
+
+		$like_button_disabled = "
+			<div style='margin-bottom: 20px;'> 
+				<form action='profile.php?user_id=$user_id&event_id=$event_id' method='POST'>
+			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like_event' disabled>$likes
+						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
+					</button>
+				</form>
+			</div>
+		";
+
+		$unlike_button = "
+			<div style='margin-bottom: 20px;'> 
+				<form action='profile.php?user_id=$user_id&event_id=$event_id$goback' method='POST'>
+			        <button style='margin-top: 20px; background-color: #e37375;' class='z-depth-2 btn waves-effect' type='submit' name='like_event'>$likes
+						<i style='border-radius: 10px;' class='material-icons right'>thumb_down</i>
+					</button>
+				</form>
+			</div>
+		";
+
+		$connection = Database::getConnection();
+		$sql = "SELECT * FROM events_likes WHERE event_id=$event_id AND user_id=$liker_user_id";
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		if (mysqli_num_rows($result) > 0) {
+			$like_button = $unlike_button;
+		}
+
+		// if ($_SESSION['user_id'] === $user_id) {
+		// 	$like_button = $like_button_disabled;
+		// }
+
+		return $like_button;
+	}
+
+	public static function getDonateButton($user_id, $donator_user_id, $event_id, $poster_user, $goback = "") {
 		session_start();
 
 		$poster_user_name = $poster_user->getName();
@@ -208,23 +261,23 @@ class Event {
 		return "
 			<div style='margin-bottom: 20px;'> 
 				<!-- Modal Trigger -->
-		        <button href='#pledgeModal$user_id$pledger_user_id$event_id' style='margin-top: 20px' class='z-depth-2 btn waves-effect modal-trigger' type='submit' name='like'>Pledge
+		        <button href='#pledgeModal$user_id$donator_user_id$event_id' style='margin-top: 20px' class='z-depth-2 btn waves-effect modal-trigger' type='submit' name='like'>Donate Now
 					<i style='border-radius: 10px;' class='material-icons right'>add_box</i>
 				</button>
 
 				<!-- Modal Structure -->
-				<div id='pledgeModal$user_id$pledger_user_id$event_id' class='modal'>
-					<form action='profile.php?user_id=$user_id&event_id=$event_id&pledge=true' method='POST'>
+				<div id='pledgeModal$user_id$donator_user_id$event_id' class='modal'>
+					<form action='profile.php?user_id=$user_id&event_id=$event_id&pledge=true$goback' method='POST'>
 						<div class='modal-content'>
 							<h4>Pledge event</h4>
-							<p style='margin-bottom: 40px;'>You are about to pledge to the event posted by $poster_user_name.</p>
+							<p style='margin-bottom: 40px;'>You are about to donate to the event posted by $poster_user_name.</p>
 							<div class='input-field'>
-						        <input placeholder = 'Enter pledge amount' autocomplete='false'  name='pledge_amount' id='event_funds_Needed' type='number' data-length='11'>
+						        <input placeholder = 'Enter donation amount' autocomplete='false'  name='donation_amount' id='event_funds_Needed' type='number' data-length='11'>
 								<label for='input_text'>Pledge</label>
 					        </div>
 						</div>
 						<div class='modal-footer'>
-							<button name='pledge_button' class='modal-close waves-effect waves-green btn-flat'>Pledge</button>
+							<button name='donate_button' class='modal-close waves-effect waves-green btn-flat'>Donate</button>
 						</div>
 					</form>
 				</div>
