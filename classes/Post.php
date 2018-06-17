@@ -53,28 +53,137 @@ class Post {
 				<div class='white z-depth-2' style='position: relative; padding: 30px; margin: 0 10px 30px 10px'>
 		");
 		if ($poster_user_id === $active_user->getID() and empty($goback)) {
+			$post_url = "http://localhost:8888/post.php?post_id=$post_id";
+
+			$uniqueID = "$post_id$poster_user_id";
+			
 			echo ("
 					<!-- Delete Floating Button -->
-					<ul id='dropdown$post_id$poster_user_id' class='dropdown-content'>
-						<form action='profile.php?user_id=$active_user_id&delete_post_id=$post_id' method='POST'>
-							<button class='btn waves-effect waves-light btn' type='submit' name='delete_post'>
+					<ul id='dropdown$uniqueID' class='dropdown-content' style='left: 100%; top: 0;'>
+						<div style='margin: 5px'>
+							<form action='profile.php?user_id=$active_user_id&delete_event_id=$event_id' method='POST'>
+							<button class='btn waves-effect waves-light btn' type='submit' name='delete_event'>
 								Delete<i class='material-icons right'>send</i>
 							</button>
-						</form>
+						</div>
+						<div style='margin: 5px'>
+							</form>
+							<!-- Modal Trigger -->
+							<button class='waves-effect waves-light btn modal-trigger' href='#event_url_modal$uniqueID'>
+								Share<i class='material-icons right'>send</i>
+							</button>
+						</div>
 					</ul>
-					
-					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown$post_id$poster_user_id'>
+
+					<!-- Modal Structure -->
+					<div id='event_url_modal$uniqueID' class='modal'>
+						<div class='modal-content'>
+							<h4>Share Post</h4>
+							<p>
+								<div class='input-field col s12'>
+									<input disabled value='$post_url' type='text'>
+									<label for='name'>Copy Post Url</label>
+								</div>
+							</p>
+						</div>
+						<div class='modal-footer'>
+							<a href='' class='modal-close waves-effect waves-green btn-flat'>Close</a>
+						</div>
+					</div>
+
+					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown$uniqueID'>
+						<i class='black-text material-icons'>more_vert</i>
+					</button>
+			");
+
+		} else {
+			$post_url = "http://localhost:8888/post.php?post_id=$post_id";
+
+			$uniqueID = "$post_id$poster_user_id";
+			
+			echo ("
+					<!-- Delete Floating Button -->
+					<ul id='dropdown$uniqueID' class='dropdown-content' style='left: 100%; top: 0;'>
+						<div style='margin: 5px'>
+							</form>
+							<!-- Modal Trigger -->
+							<button class='waves-effect waves-light btn modal-trigger' href='#event_url_modal$uniqueID'>
+								Share<i class='material-icons right'>send</i>
+							</button>
+						</div>
+					</ul>
+
+					<!-- Modal Structure -->
+					<div id='event_url_modal$uniqueID' class='modal'>
+						<div class='modal-content'>
+							<h4>Share Post</h4>
+							<p>
+								<div class='input-field col s12'>
+									<input disabled value='$post_url' type='text'>
+									<label for='name'>Copy Post Url</label>
+								</div>
+							</p>
+						</div>
+						<div class='modal-footer'>
+							<a href='' class='modal-close waves-effect waves-green btn-flat'>Close</a>
+						</div>
+					</div>
+
+					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown$uniqueID'>
 						<i class='black-text material-icons'>more_vert</i>
 					</button>
 			");
 		}
+
+		$profile_picture_directory = $this->poster_user->getProfilePictureDirectory();
+
+		$image_style = "style='
+			height: 55px;
+			width: 55px;
+			border: 1px solid #004d40;
+			border-radius: 50%;
+			float: left;
+			margin: 0 20px 0 0;
+
+			user-drag: none; 
+			user-select: none;
+			-moz-user-select: none;
+			-webkit-user-drag: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		'";
+
+		$profile_url = "href='profile.php?user_id=$poster_user_id'";
+
+		$p_style = "style='
+			margin: 0;
+			padding: 0;
+			font-size: 10pt;
+		'";
+
+		$a_options = "
+			href='post.php?post_id=$post_id' 
+			style='color: inherit;'
+		";
+
 		echo ("
 					<!-- Post -->
 					<span class='black-text'>
-						<a style='color: inherit;' href='profile.php?user_id=$poster_user_id'>
-							<h5 style='margin-top: 0'><b>$poster_user_name</b></h5>
-						</a>
-						<b>Posted at: </b><text style='color: #90949c'>$date at $time</text>
+						<div>
+							<a style='color: inherit;' $profile_url>
+								<img $profile_url src='$profile_picture_directory' $image_style alt='profile_picture' id='banner-image' class='circle responsive-img'>
+							</a>
+							<h5>
+								<a style='color: inherit;' $profile_url><b>$poster_user_name</b></a>
+							</h5>
+						</div>
+						<div style='margin-top: 10px'>
+							<p $p_style>
+								<a $a_options>
+									<b>Posted at: </b><text style='color: #90949c'>$date at $time</text>
+								</a>
+							</p>
+						</div>
 						$like_button
 						<div class='z-depth-1' style='margin: 20px 0 20px 0; padding: 10px 20px 10px 20px'>
 							<p style='font-size: 14pt; line-height: 5px;'><b>$title</b></p>
@@ -168,10 +277,16 @@ class Post {
 	public static function getLikeButton($user_id, $liker_user_id, $post_id, $likes, $goback = "") {
 		session_start();
 
+		$style = "style='
+			margin: 40px 20px 0 0; 
+			float: right; 
+			background-color: #e37375;
+		'";
+
 		$like_button = "
 			<div style='margin-bottom: 20px;'> 
 				<form action='profile.php?user_id=$user_id&post_id=$post_id$goback' method='POST'>
-			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like_post'>$likes
+			        <button $style class='z-depth-2 teal accent-4 btn waves-effect' type='submit' name='like_post'>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
 					</button>
 				</form>
@@ -181,7 +296,7 @@ class Post {
 		$like_button_disabled = "
 			<div style='margin-bottom: 20px;'> 
 				<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
-			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like_post' disabled>$likes
+			        <button $style class='z-depth-2 btn waves-effect' type='submit' name='like_post' disabled>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
 					</button>
 				</form>
@@ -191,7 +306,7 @@ class Post {
 		$unlike_button = "
 			<div style='margin-bottom: 20px;'> 
 				<form action='profile.php?user_id=$user_id&post_id=$post_id$goback' method='POST'>
-			        <button style='margin-top: 20px; background-color: #e37375;' class='z-depth-2 btn waves-effect' type='submit' name='like_post'>$likes
+			        <button $style class='z-depth-2 btn waves-effect' type='submit' name='like_post'>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_down</i>
 					</button>
 				</form>
@@ -212,5 +327,22 @@ class Post {
 		// }
 
 		return $like_button;
+	}
+
+	public function getID() {
+		return $this->id;
+	}
+
+	public function getPosterUser() {
+		return $this->poster_user;
+	}
+
+	public static function exists($post) {
+		$connection = Database::getConnection();
+		$sql = sprintf("SELECT * FROM posts WHERE id=%d", $post->getID());
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		return mysqli_num_rows($result) > 0;
 	}
 }

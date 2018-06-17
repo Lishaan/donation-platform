@@ -288,6 +288,10 @@ class User {
 			$goback = "&goback=" . $_GET['goback'];
 		}
 
+		if (isset($_GET['event_id'])) {
+			$goback .= "&event_id=" . $_GET['event_id'];
+		}
+
 
 		if ($donation_amount > 0) {
 			$sql = "INSERT INTO events_donations (event_id, donator_user_id, donation_amount, donated_at) VALUES ($event_id, $donator_user_id, $donation_amount, now())";
