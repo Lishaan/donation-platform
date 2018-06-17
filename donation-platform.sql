@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    name varchar(20) NOT NULL,
+    name varchar(32) NOT NULL,
     email varchar(128) NOT NULL,
     password varchar(128) NOT NULL,
     type char(1) NOT NULL, -- 'D' (Donators) or O (organisations)

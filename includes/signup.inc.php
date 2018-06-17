@@ -60,10 +60,10 @@ if (isset($_POST['submit']) and isset($_GET['type'])) {
 
 				// User Info
 				if ($type === "D") {
-					$sql = sprintf("INSERT INTO donators_info (user_id, profile_picture_directory, profile_bio) VALUES (%d, '%s', '%s')", $user_id, $profile_picture_directory, "No Bio.");
+					$sql = sprintf("INSERT INTO donators_info (user_id, profile_picture_directory, profile_bio) VALUES (%d, '%s', '%s')", $user_id, $profile_picture_directory, "");
 					mysqli_query($connection, $sql);
 				} else {
-					$sql = sprintf("INSERT INTO organisations_info (user_id, profile_picture_directory, profile_description, category) VALUES ('%d', '%s', '%s', '%s')", $user_id, "$profile_picture_directory", "No Description.", mysqli_real_escape_string($connection, $_POST['category']));
+					$sql = sprintf("INSERT INTO organisations_info (user_id, profile_picture_directory, profile_description, category) VALUES ('%d', '%s', '%s', '%s')", $user_id, "$profile_picture_directory", "", mysqli_real_escape_string($connection, $_POST['category']));
 					mysqli_query($connection, $sql);
 				}
 

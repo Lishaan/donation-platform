@@ -40,7 +40,7 @@ class User {
 			<script type='text/javascript'> 
 			window.location.href='../profile.php?user_id=$user_id';
 			</script>
-		");
+			");
 	}
 
 	public function unfollow(User $user) {
@@ -52,9 +52,9 @@ class User {
 		$user_id = $user->getID();
 		echo ("
 			<script type='text/javascript'> 
-				window.location.href='../profile.php?user_id=$user_id';
+			window.location.href='../profile.php?user_id=$user_id';
 			</script>
-		");
+			");
 	}
 
 	public function getFollowersArray() {
@@ -129,7 +129,7 @@ class User {
 	public function getEventsAndPostsFollowing() {
 		$connection = Database::getConnection();
 		$sql = sprintf("SELECT * FROM ((SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id IN (SELECT follower_user_id FROM followers WHERE user_id= %d) ORDER BY posted_at DESC;", $this->getID());
-		
+
 		$result = mysqli_query($connection, $sql);
 		$connection->close();
 
@@ -143,7 +143,7 @@ class User {
 			} else {
 				$post = new Post((int) $row['id']);
 				array_push($eventsAndPosts, $post);
-			}			
+			}   
 		}
 
 		return $eventsAndPosts;
@@ -175,9 +175,9 @@ class User {
 		$user_id = $this->id;
 		echo ("
 			<script type='text/javascript'> 
-				window.location.href='../profile.php?user_id=$user_id&create_post=success';
+			window.location.href='../profile.php?user_id=$user_id&create_post=success';
 			</script>
-		");
+			");
 	}
 
 	public function deletePost(int $post_id) {
@@ -194,9 +194,9 @@ class User {
 		$user_id = $this->id;
 		echo ("
 			<script type='text/javascript'> 
-				window.location.href='../profile.php?user_id=$user_id&delete_post=success';
+			window.location.href='../profile.php?user_id=$user_id&delete_post=success';
 			</script>
-		");
+			");
 	}
 
 	public function likePost(int $post_id) {
@@ -230,9 +230,9 @@ class User {
 		$user_id = $this->id;
 		echo ("
 			<script type='text/javascript'> 
-				window.location.href='../profile.php?user_id=$user_id&create_event=success';
+			window.location.href='../profile.php?user_id=$user_id&create_event=success';
 			</script>
-		");
+			");
 	}
 
 	public function deleteEvent(int $event_id) {
@@ -251,9 +251,9 @@ class User {
 		$user_id = $this->id;
 		echo ("
 			<script type='text/javascript'> 
-				window.location.href='../profile.php?user_id=$user_id&delete_event=success';
+			window.location.href='../profile.php?user_id=$user_id&delete_event=success';
 			</script>
-		");
+			");
 	}
 
 	public function likeEvent(int $event_id) {
@@ -288,6 +288,10 @@ class User {
 			$goback = "&goback=" . $_GET['goback'];
 		}
 
+		if (isset($_GET['event_id'])) {
+			$goback .= "&event_id=" . $_GET['event_id'];
+		}
+
 
 		if ($donation_amount > 0) {
 			$sql = "INSERT INTO events_donations (event_id, donator_user_id, donation_amount, donated_at) VALUES ($event_id, $donator_user_id, $donation_amount, now())";
@@ -296,16 +300,16 @@ class User {
 			$connection->close();
 			echo ("
 				<script type='text/javascript'> 
-					window.location.href='../profile.php?user_id=$user_id&donate_event=success$goback';
+				window.location.href='../profile.php?user_id=$user_id&donate_event=success$goback';
 				</script>
-			");
+				");
 		} else {
 			$connection->close();
 			echo ("
 				<script type='text/javascript'> 
-					window.location.href='../profile.php?user_id=$user_id&donate_event=failed$goback';
+				window.location.href='../profile.php?user_id=$user_id&donate_event=failed$goback';
 				</script>
-			");
+				");
 		}
 	}
 
@@ -341,7 +345,7 @@ class User {
 
 			$row = mysqli_fetch_assoc($result);
 
-			return $row['profile_description'];
+			return $row['category'];
 		} else {
 			return false;
 		}
@@ -377,6 +381,23 @@ class User {
 
 	public function isDonator() { return $this->type === "D" ? true : false; }
 
+	public static function getOrganisations() {
+		$connection = Database::getConnection();
+		$sql = "SELECT * FROM users WHERE type='O'";
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		$users = array();
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			$user = new User((int) $row['id']);
+
+			array_push($users, $user);
+		}
+
+		return $users;
+	}
+	
 	public static function exists($user) {
 		$connection = Database::getConnection();
 		$sql = sprintf("SELECT * FROM users WHERE id=%d", $user->getID());
@@ -404,4 +425,5 @@ class User {
 			die("Please login");
 		}
 	}
+
 }

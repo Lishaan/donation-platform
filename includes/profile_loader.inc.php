@@ -127,9 +127,10 @@ if (isset($_GET['user_id'])) {
 
 			$user_id = $active_user->getID();
 			$new_bio = $_POST['biodesc'];
+			$change_bio = $new_bio !== $active_user->getBioDesc();
 
 
-			if (isset($_FILES['profile_picture_image'])) {
+			if (!empty($_FILES['profile_picture_image']['tmp_name'])) {
 				define('MB', 1048576);
 
 				$file = $_FILES['profile_picture_image'];
@@ -194,7 +195,7 @@ if (isset($_GET['user_id'])) {
 				}
 			}
 
-			if ($new_bio !== $active_user->getBioDesc()) {
+			if ($change_bio) {
 				if ($active_user->isDonator()) {
 					$sql = "UPDATE donators_info SET profile_bio='$new_bio' WHERE user_id=$user_id";
 					mysqli_query($connection, $sql);
@@ -237,9 +238,20 @@ if (isset($_GET['user_id'])) {
 
 if (isset($_GET['goback'])) {
 	$goback = $_GET['goback'];
+
+	$args = "?";
+
+	if (isset($_GET['event_id'])) {
+		$args .= "event_id=" . $_GET['event_id'];
+	}
+
+	if (isset($_GET['post_id'])) {
+		$args .= "post_id=" . $_GET['post_id'];
+	}
+
 	echo ("
 		<script type='text/javascript'> 
-			window.location.href='../$goback.php';
+			window.location.href='../$goback.php$args';
 		</script>
 	");
 }

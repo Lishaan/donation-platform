@@ -12,7 +12,7 @@ function render_navbar($activepage) { ?>
 						<li class="<?php echo $activepage === 'Home' ? "active" : '' ?>"><a href="index.php">Home</a></li>
 						<li class="<?php echo $activepage === 'About' ? "active" : '' ?>"><a href="#">About</a></li>
 						<li class="<?php echo substr($activepage, 0, 4) === 'Feed' ? "active" : '' ?>"><a href="feed.php">Feed</a></li>
-						<li class="<?php echo $activepage === 'Explore' ? "active" : '' ?>"><a href="#">Explore</a></li>
+						<li class="<?php echo substr($activepage, 0, 7) === 'Explore' ? "active" : '' ?>"><a href="explore.php">Explore</a></li>
 					</ul>
 
 					<?php if (!isset($_SESSION['user_id'])): ?>

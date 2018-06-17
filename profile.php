@@ -88,8 +88,8 @@ render_navbar("Profile - " . $user->getName());
 									<div class="collapsible-body" style="padding: 40px;">
       									<div class="z-depth-1" style="padding: 40px">
 	      									<div class="row" style="margin: 0 0 40px 0">	
-	      										<ul class="tabs tabs-fixed-width">
-													<li class="tab col s6"><a class="active" href="#Post">Post</a></li>
+	      										<ul class="tabs tabs-fixed-width" id="tab_fg">
+													<li id="tab_post" class="tab col s6"><a class="active" href="#Post">Post</a></li>
 													<li class="tab col s6"><a href="#Event">Event</a></li>
 												</ul>										
 											</div>
@@ -265,7 +265,7 @@ render_navbar("Profile - " . $user->getName());
 </main>
 <?php endif; ?>
 <script type="text/javascript">
-	$(document).ready(function() {
+	$(document).ready(() => {
 		$('.sidenav').sidenav();
 		$('.tooltipped').tooltip();
 		$('.tabs').tabs();
@@ -280,19 +280,19 @@ render_navbar("Profile - " . $user->getName());
 		$('.tabs').tabs('updateTabIndicator');
 
 		function postCheck() {
-		   if($('#post_textarea').val().length > 0) {
-		      $('#post_submit').prop("disabled", false);
-		   }else {
-		      $('#post_submit').prop("disabled", true);
-		   }
+			if ($('#post_textarea').val().length > 0) {
+				$('#post_submit').prop("disabled", false);
+			} else {
+				$('#post_submit').prop("disabled", true);
+			}
 		};
 
 		function eventCheck() {
-			if($('#event_textarea').val().length > 0 && $('#event_funds_Needed').val().length > 0) {
-		      $('#event_submit').prop("disabled", false);
-		   }else {
-		      $('#event_submit').prop("disabled", true);
-		   }
+			if ($('#event_textarea').val().length > 0 && $('#event_funds_Needed').val().length > 0) {
+				$('#event_submit').prop("disabled", false);
+			} else {
+				$('#event_submit').prop("disabled", true);
+			}
 		};
 	});
 </script>

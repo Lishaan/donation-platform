@@ -17,8 +17,6 @@ render_navbar("Feed - " . $active_user->getName());
 
 <link rel="stylesheet" href="assets/css/feed.css">
 <main>
-
-
 	<div class="row" style="margin-bottom: 10px">
 		<div class="col s12">
 			<ul class="tabs z-depth-1">
@@ -47,12 +45,6 @@ render_navbar("Feed - " . $active_user->getName());
 			<!-- Center -->
 			<div class="col s6">
 				<?php 
-				// $posts = $active_user->getPosts();
-
-				// foreach ($posts as $post) {
-				// 	$post->render($active_user, $active_user, "&goback=feed");
-				// }
-
 				$posts_and_events = $active_user->getEventsAndPostsFollowing();
 
 				foreach ($posts_and_events as $post_event) {
@@ -78,8 +70,42 @@ render_navbar("Feed - " . $active_user->getName());
 			</div>
 		</div>
 		<div id="global" class="col s12">
-			<div class='col s3 white z-depth-2' style='margin-bottom: 20%'>
+			<!-- Left -->
+			<div class='col s3 white z-depth-2' style='margin-bottom: 20%; padding: 20px'>
+				<h5><b>Useful Links</b></h5>
 
+				<ul>
+					<li>• wwf.com.org</li>
+					<li>• aspca.com.org</li>
+					<li>• UNICEF.com.org</li>
+				</ul>
+			</div>
+
+			<!-- Center -->
+			<div class="col s6">
+				<?php 
+				$posts_and_events = $active_user->getEventsAndPosts();
+
+				foreach ($posts_and_events as $post_event) {
+					$post_event->render($active_user, $active_user, "&goback=feed");
+				}
+
+				if (empty($posts_and_events)) {
+					echo ("
+						<div class='row'>
+							<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 10px -10px 10px;'>
+								<span class='black-text'>
+									<div>
+										<text style='font-size: 12pt'>
+											No Posts or Events
+										</text>
+									</div>
+								</span>
+							</div>
+						</div>
+					");
+				}
+				?>
 			</div>
 		</div>
 	</div>
@@ -90,8 +116,8 @@ render_navbar("Feed - " . $active_user->getName());
     $('.tabs').tabs();
     $('.collapsible').collapsible();
     $('.modal').modal();
+    $('.tooltipped').tooltip();
   });
-     
 </script> 
 
 <?php 
