@@ -13,6 +13,7 @@ class Event {
 	private $total_donations;
 
 	public function __construct(int $id) {
+		
 		$connection = Database::getConnection();
 		$sql = "SELECT * FROM events WHERE id=$id";
 		$result = mysqli_query($connection, $sql);
@@ -63,152 +64,32 @@ class Event {
 			<div class='row'>
 				<div class='white z-depth-2' style='position: relative; padding: 30px; margin: 0 10px 30px 10px'>
 		");
+
 		
 		if ($poster_user_id === $active_user->getID() and empty($goback)) {
-
-
-			$event_url = "http://localhost:8888/event.php?event_id=$event_id";
-
-			$uniqueID = "$event_id$poster_user_id";
 			
 			echo ("
 					<!-- Delete Floating Button -->
-					<ul id='dropdown$uniqueID' class='dropdown-content' style='left: 100%; top: 0;'>
-						<div style='margin: 5px'>
-							<form action='profile.php?user_id=$active_user_id&delete_event_id=$event_id' method='POST'>
+					<ul id='dropdown$event_id$poster_user_id' class='dropdown-content'>
+						<form action='profile.php?user_id=$active_user_id&delete_event_id=$event_id' method='POST'>
 							<button class='btn waves-effect waves-light btn' type='submit' name='delete_event'>
 								Delete<i class='material-icons right'>send</i>
 							</button>
-						</div>
-						<div style='margin: 5px'>
-							</form>
-							<!-- Modal Trigger -->
-							<button class='waves-effect waves-light btn modal-trigger' href='#event_url_modal$uniqueID'>
-								Share<i class='material-icons right'>send</i>
-							</button>
-						</div>
+						</form>
 					</ul>
-
-					<!-- Modal Structure -->
-					<div id='event_url_modal$uniqueID' class='modal'>
-						<div class='modal-content'>
-							<h4>Share Event</h4>
-							<p>
-								<div class='input-field col s12'>
-									<input disabled value='$event_url' type='text'>
-									<label for='name'>Copy Event Url</label>
-								</div>
-							</p>
-						</div>
-						<div class='modal-footer'>
-							<a href='' class='modal-close waves-effect waves-green btn-flat'>Close</a>
-						</div>
-					</div>
-
-					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown$uniqueID'>
+					
+					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown$event_id$poster_user_id'>
 						<i class='black-text material-icons'>more_vert</i>
 					</button>
 			");
-
-		} else {
-
-
-
-			$event_url = "http://localhost:8888/event.php?event_id=$event_id";
-
-			$uniqueID = "$event_id$poster_user_id";
-			
-			echo ("
-					<!-- Delete Floating Button -->
-					<ul id='dropdown$uniqueID' class='dropdown-content' style='left: 100%; top: 0;'>
-						<div style='margin: 5px'>
-							<form action='profile.php?user_id=$active_user_id&delete_event_id=$event_id' method='POST'>
-							<button class='btn waves-effect waves-light btn' type='submit' name='delete_event'>
-								Delete<i class='material-icons right'>send</i>
-							</button>
-						</div>
-						<div style='margin: 5px'>
-							</form>
-							<!-- Modal Trigger -->
-							<button class='waves-effect waves-light btn modal-trigger' href='#event_url_modal$uniqueID'>
-								Share<i class='material-icons right'>send</i>
-							</button>
-						</div>
-					</ul>
-
-					<!-- Modal Structure -->
-					<div id='event_url_modal$uniqueID' class='modal'>
-						<div class='modal-content'>
-							<h4>Share Event</h4>
-							<p>
-								<div class='input-field col s12'>
-									<input disabled value='$event_url' type='text'>
-									<label for='name'>Copy Event Url</label>
-								</div>
-							</p>
-						</div>
-						<div class='modal-footer'>
-							<a href='' class='modal-close waves-effect waves-green btn-flat'>Close</a>
-						</div>
-					</div>
-
-					<button style='position: absolute; margin-left: 85%;' class='dropdown-trigger white btn-floating' data-target='dropdown$uniqueID'>
-						<i class='black-text material-icons'>more_vert</i>
-					</button>
-			");
-
 
 		}
-
-		$profile_picture_directory = $this->poster_user->getProfilePictureDirectory();
-
-		$image_style = "style='
-			height: 55px;
-			width: 55px;
-			border: 1px solid #004d40;
-			border-radius: 50%;
-			float: left;
-			margin: 0 20px 0 0;
-
-			user-drag: none; 
-			user-select: none;
-			-moz-user-select: none;
-			-webkit-user-drag: none;
-			-webkit-user-select: none;
-			-ms-user-select: none;
-		'";
-
-		$profile_url = "href='profile.php?user_id=$poster_user_id'";
-
-		$p_style = "style='
-			margin: 0;
-			padding: 0;
-			font-size: 10pt;
-		'";
-
-		$a_options = "
-			href='event.php?event_id=$event_id' 
-			style='color: inherit;'
-		";
 		
 		echo ("
 					<!-- Event -->
 					<span class='black-text'>
-						<div>
-							<a style='color: inherit;' $profile_url>
-								<img $profile_url src='$profile_picture_directory' $image_style alt='profile_picture' id='banner-image' class='circle responsive-img'>
-							</a>
-							<h5>
-								<a style='color: inherit;' $profile_url><b>Event by $poster_user_name</b></a>
-							</h5>
-						</div>
-						<div style='margin-top: 10px'>
-							<p $p_style>
-								<a $a_options>
-									<b>Posted at: </b><text style='color: #90949c'>$date at $time</text>
-								</a>
-							</p>
-						</div>
+						<a style='color: inherit;' href='profile.php?user_id=$poster_user_id'><h5><b>Event by $poster_user_name</b></h5></a>
+						<b>Posted at: </b><text style='color: #90949c'>$date at $time</text>
 						$like_button
 						<div class='z-depth-1' style='margin: 20px 0 20px 0; padding: 10px 20px 10px 20px'>
 							<p style='font-size: 14pt; line-height: 5px;'><b>$title</b></p>
@@ -222,6 +103,7 @@ class Event {
 						</div>
 					</span>
 
+					
 					<!-- Comment section-->
 					<ul class='collapsible'>
 						<li>
@@ -287,22 +169,6 @@ class Event {
 		return $total;
 	}
 
-	public function getDonationsArray() {
-		$connection = Database::getConnection();
-		$event_id = $this->id;
-		$sql = "SELECT * FROM events_donations WHERE event_id=$event_id ORDER BY donated_at DESC";
-		$result = mysqli_query($connection, $sql);
-		$connection->close();
-
-		$donations = array();
-
-		while ($row = mysqli_fetch_assoc($result)) {
-			array_push($donations, $row);
-		}
-
-		return $donations;
-	}
-
 	public function getComments() {
 		$connection = Database::getConnection();
 		$sql = sprintf("SELECT * FROM comments WHERE event_id=%d ORDER BY posted_at ASC", $this->id);
@@ -341,17 +207,10 @@ class Event {
 	public static function getLikeButton($user_id, $liker_user_id, $event_id, $likes, $goback = "") {
 		session_start();
 
-		$style = "style='
-			margin: 40px 20px 0 0; 
-			float: right; 
-			background-color: #e37375;
-		'";
-
-
 		$like_button = "
 			<div style='margin-bottom: 20px;'> 
 				<form action='profile.php?user_id=$user_id&event_id=$event_id$goback' method='POST'>
-			        <button $style class='z-depth-2 btn teal accent-4 waves-effect' type='submit' name='like_event'>$likes
+			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like_event'>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
 					</button>
 				</form>
@@ -361,7 +220,7 @@ class Event {
 		$like_button_disabled = "
 			<div style='margin-bottom: 20px;'> 
 				<form action='profile.php?user_id=$user_id&event_id=$event_id' method='POST'>
-			        <button $style class='z-depth-2 btn waves-effect' type='submit' disabled>$likes
+			        <button style='margin-top: 20px' class='z-depth-2 btn waves-effect' type='submit' name='like_event' disabled>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
 					</button>
 				</form>
@@ -371,7 +230,7 @@ class Event {
 		$unlike_button = "
 			<div style='margin-bottom: 20px;'> 
 				<form action='profile.php?user_id=$user_id&event_id=$event_id$goback' method='POST'>
-			        <button $style class='z-depth-2 btn waves-effect' type='submit' name='like_event'>$likes
+			        <button style='margin-top: 20px; background-color: #e37375;' class='z-depth-2 btn waves-effect' type='submit' name='like_event'>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_down</i>
 					</button>
 				</form>
@@ -410,7 +269,7 @@ class Event {
 				<div id='pledgeModal$user_id$donator_user_id$event_id' class='modal'>
 					<form action='profile.php?user_id=$user_id&event_id=$event_id&pledge=true$goback' method='POST'>
 						<div class='modal-content'>
-							<h4>Donate event</h4>
+							<h4>Pledge event</h4>
 							<p style='margin-bottom: 40px;'>You are about to donate to the event posted by $poster_user_name.</p>
 							<div class='input-field'>
 						        <input placeholder = 'Enter donation amount' autocomplete='false'  name='donation_amount' id='event_funds_Needed' type='number' data-length='11'>
@@ -424,22 +283,5 @@ class Event {
 				</div>
 			</div>
 		";
-	}
-
-	public function getID() {
-		return $this->id;
-	}
-
-	public function getPosterUser() {
-		return $this->poster_user;
-	}
-
-	public static function exists($event) {
-		$connection = Database::getConnection();
-		$sql = sprintf("SELECT * FROM events WHERE id=%d", $event->getID());
-		$result = mysqli_query($connection, $sql);
-		$connection->close();
-
-		return mysqli_num_rows($result) > 0;
 	}
 }

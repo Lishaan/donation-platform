@@ -128,7 +128,7 @@ class User {
 
 	public function getEventsAndPostsFollowing() {
 		$connection = Database::getConnection();
-		$sql = sprintf("SELECT * FROM ((SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id=%d ORDER BY posted_at DESC", $this->getID());
+		$sql = sprintf("SELECT * FROM ((SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id IN (SELECT follower_user_id FROM followers WHERE user_id= %d) ORDER BY posted_at DESC;", $this->getID());
 		
 		$result = mysqli_query($connection, $sql);
 		$connection->close();
@@ -286,10 +286,6 @@ class User {
 
 		if (isset($_GET['goback'])) {
 			$goback = "&goback=" . $_GET['goback'];
-		}
-
-		if (isset($_GET['event_id'])) {
-			$goback .= "&event_id=" . $_GET['event_id'];
 		}
 
 

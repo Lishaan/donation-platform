@@ -152,6 +152,7 @@ if ($_GET['upload-file'] === "file-type") {
 					<button class="btn-small waves-effect waves-light " type="submit" name="update_edit_profile" style="float: right">
 						Update<i class="material-icons right">send</i>
 					</button>
+					<a href="profile.php?user_id=<?php echo $active_user->getID() ?>&edit-profile=true" class="waves-effect waves-light btn-small" style="float: right; margin-right: 10px">Cancel</a>
 				</div>
 			</form>
 		</div>
