@@ -47,36 +47,35 @@ class Post {
 
 		$active_user_id = $active_user->getID();
 
+		$post_url = "http://$_SERVER[HTTP_HOST]/post.php?post_id=$post_id";
+		$uniqueID = "$post_id$poster_user_id" . Database::getRandomID();
+		
 		// Render Post
 		echo ("
 			<div class='row'>
 				<div class='white z-depth-2' style='position: relative; padding: 30px; margin: 0 10px 30px 10px'>
 		");
 		if ($poster_user_id === $active_user->getID() and empty($goback)) {
-			$post_url = "http://localhost:8888/post.php?post_id=$post_id";
-
-			$uniqueID = "$post_id$poster_user_id";
-			
 			echo ("
 					<!-- Delete Floating Button -->
 					<ul id='dropdown$uniqueID' class='dropdown-content' style='left: 100%; top: 0;'>
 						<div style='margin: 5px'>
-							<form action='profile.php?user_id=$active_user_id&delete_event_id=$event_id' method='POST'>
-							<button class='btn waves-effect waves-light btn' type='submit' name='delete_event'>
+							<form action='profile.php?user_id=$active_user_id&delete_post_id=$post_id' method='POST'>
+							<button class='btn waves-effect waves-light btn' type='submit' name='delete_post'>
 								Delete<i class='material-icons right'>send</i>
 							</button>
 						</div>
 						<div style='margin: 5px'>
 							</form>
 							<!-- Modal Trigger -->
-							<button class='waves-effect waves-light btn modal-trigger' href='#event_url_modal$uniqueID'>
+							<button class='waves-effect waves-light btn modal-trigger' href='#post_url_modal$uniqueID'>
 								Share<i class='material-icons right'>send</i>
 							</button>
 						</div>
 					</ul>
 
 					<!-- Modal Structure -->
-					<div id='event_url_modal$uniqueID' class='modal'>
+					<div id='post_url_modal$uniqueID' class='modal'>
 						<div class='modal-content'>
 							<h4>Share Post</h4>
 							<p>
@@ -97,10 +96,6 @@ class Post {
 			");
 
 		} else {
-			$post_url = "http://localhost:8888/post.php?post_id=$post_id";
-
-			$uniqueID = "$post_id$poster_user_id";
-			
 			echo ("
 					<!-- Delete Floating Button -->
 					<ul id='dropdown$uniqueID' class='dropdown-content' style='left: 100%; top: 0;'>

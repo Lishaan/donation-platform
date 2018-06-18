@@ -1,4 +1,5 @@
 <style type="text/css" media="screen">
+
 .tabs .tab a,
 .tabs .tab.disabled a,
 .tabs .tab.disabled a:hover {
@@ -89,17 +90,21 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="input-field col s12 m6">
+					<div class="input-field col s12">
+						<!-- <i class="material-icons prefix left" style="padding-right: 20px;">category</i> -->
 						<select name="category" class="icons">
 							<option value="" disabled selected>Choose your option</option>
-							<option value="Pet and Animal Welfare" class="left">Pet and Animal Welfare</option>
-							<option value="Environmental Conservation & Protection" class="left">Environmental Conservation & Protection</option>
-							<option value="Medical Services & Treatment" class="left">Medical Services & Treatment</option>
-							<option value="Scholarship and financial aid services" class="left">Scholarship and financial aid services</option>
-							<option value="Arts & Culture" class="left">Arts & Culture</option>
-							<!-- <option value="" data-icon="images/sample-1.jpg" class="left">example 1</option> -->
+							<?php 
+							require($root_dir . '/classes/Database.php');
+							$categories = Database::getCategories();
+
+							foreach ($categories as $category) {
+								echo ("<option value='$category' class='left'>$category</option>");
+							}
+
+							?>
 						</select>
-						<label>Category</label>
+						<label for="category">Category</label>
 					</div>
 				</div>
 				<div style="margin: 10px 0 30px 0"><a href="index.php?form=login">Already have an account? Log in!</a></div>

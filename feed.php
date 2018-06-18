@@ -48,7 +48,7 @@ render_navbar("Feed - " . $active_user->getName());
 				$posts_and_events = $active_user->getEventsAndPostsFollowing();
 
 				foreach ($posts_and_events as $post_event) {
-					$post_event->render($active_user, $active_user, "&goback=feed");
+					$post_event->render($post_event->getPosterUser(), $active_user, "&goback=feed");
 				}
 
 				if (empty($posts_and_events)) {
@@ -84,10 +84,10 @@ render_navbar("Feed - " . $active_user->getName());
 			<!-- Center -->
 			<div class="col s6">
 				<?php 
-				$posts_and_events = $active_user->getEventsAndPosts();
+				$posts_and_events = $active_user->getEventsAndPostsGlobal();
 
 				foreach ($posts_and_events as $post_event) {
-					$post_event->render($active_user, $active_user, "&goback=feed");
+					$post_event->render($post_event->getPosterUser(), $active_user, "&goback=feed");
 				}
 
 				if (empty($posts_and_events)) {

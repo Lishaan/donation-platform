@@ -1,5 +1,4 @@
-<?php
-$root_dir = $_SERVER["DOCUMENT_ROOT"];
+<?php $root_dir = $_SERVER["DOCUMENT_ROOT"];
 
 require($root_dir . '/includes/dbh.inc.php');
 require($root_dir . '/classes/User.php');

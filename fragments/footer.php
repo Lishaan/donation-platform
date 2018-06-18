@@ -17,11 +17,13 @@
 			<div class="col l3" style="text-align: left; line-height: 30px ">
 				<h5 class="white-text">Browse Categories</h5>
 				<ul class="footer-list">
-					<li><a class="grey-text text-lighten-3" href="#">Clubs and communities</a></li>
-					<li><a class="grey-text text-lighten-3" href="#">Environment</a></li>
-					<li><a class="grey-text text-lighten-3" href="#">Hunger</a></li>
-					<li><a class="grey-text text-lighten-3" href="#">Poverty</a></li>
-					<li><a class="grey-text text-lighten-3" href="#">Animals</a></li>
+					<?php
+					$categories = Database::getCategories();
+
+					foreach ($categories as $category) {
+						echo "<li><a class='grey-text text-lighten-3' href='explore.php'>$category</a></li>";
+					}
+					?>
 				</ul>
 			</div>
 

@@ -57,34 +57,30 @@ class Event {
 
 		$active_user_id = $active_user->getID();
 
+		$event_url = "http://$_SERVER[HTTP_HOST]/event.php?event_id=$event_id";
+		$uniqueID = "$event_id$poster_user_id" . Database::getRandomID();
+
 		// Render Event
-		
 		echo ("
 			<div class='row'>
 				<div class='white z-depth-2' style='position: relative; padding: 30px; margin: 0 10px 30px 10px'>
 		");
 		
 		if ($poster_user_id === $active_user->getID() and empty($goback)) {
-
-
-			$event_url = "http://localhost:8888/event.php?event_id=$event_id";
-
-			$uniqueID = "$event_id$poster_user_id";
-			
 			echo ("
 					<!-- Delete Floating Button -->
 					<ul id='dropdown$uniqueID' class='dropdown-content' style='left: 100%; top: 0;'>
-						<div style='margin: 5px'>
-							<form action='profile.php?user_id=$active_user_id&delete_event_id=$event_id' method='POST'>
-							<button class='btn waves-effect waves-light btn' type='submit' name='delete_event'>
-								Delete<i class='material-icons right'>send</i>
-							</button>
-						</div>
 						<div style='margin: 5px'>
 							</form>
 							<!-- Modal Trigger -->
 							<button class='waves-effect waves-light btn modal-trigger' href='#event_url_modal$uniqueID'>
 								Share<i class='material-icons right'>send</i>
+							</button>
+						</div>
+						<div style='margin: 5px'>
+							<form action='profile.php?user_id=$active_user_id&delete_event_id=$event_id' method='POST'>
+							<button class='btn waves-effect waves-light btn' type='submit' name='delete_event'>
+								Delete<i class='material-icons right'>send</i>
 							</button>
 						</div>
 					</ul>
@@ -111,22 +107,9 @@ class Event {
 			");
 
 		} else {
-
-
-
-			$event_url = "http://localhost:8888/event.php?event_id=$event_id";
-
-			$uniqueID = "$event_id$poster_user_id";
-			
 			echo ("
 					<!-- Delete Floating Button -->
 					<ul id='dropdown$uniqueID' class='dropdown-content' style='left: 100%; top: 0;'>
-						<div style='margin: 5px'>
-							<form action='profile.php?user_id=$active_user_id&delete_event_id=$event_id' method='POST'>
-							<button class='btn waves-effect waves-light btn' type='submit' name='delete_event'>
-								Delete<i class='material-icons right'>send</i>
-							</button>
-						</div>
 						<div style='margin: 5px'>
 							</form>
 							<!-- Modal Trigger -->
@@ -156,8 +139,6 @@ class Event {
 						<i class='black-text material-icons'>more_vert</i>
 					</button>
 			");
-
-
 		}
 
 		$profile_picture_directory = $this->poster_user->getProfilePictureDirectory();

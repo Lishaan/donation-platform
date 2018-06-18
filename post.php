@@ -38,8 +38,8 @@ if (isset($_GET['post_id'])) {
 require($root_dir . '/fragments/head.php');
 require($root_dir . '/fragments/navbar.php');
 
-render_head("Event - " . $user->getName());
-render_navbar("Event - " . $user->getName());
+render_head("Post - " . $user->getName());
+render_navbar("Post - " . $user->getName());
 ?>
 
 <link rel="stylesheet" href="assets/css/profile.css">

@@ -128,7 +128,30 @@ class User {
 
 	public function getEventsAndPostsFollowing() {
 		$connection = Database::getConnection();
-		$sql = sprintf("SELECT * FROM ((SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id IN (SELECT follower_user_id FROM followers WHERE user_id= %d) ORDER BY posted_at DESC;", $this->getID());
+		$sql = sprintf("SELECT * FROM ((SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results WHERE poster_user_id IN (SELECT user_id FROM followers WHERE follower_user_id= %d) ORDER BY posted_at DESC", $this->getID());
+
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		$eventsAndPosts = array();
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			if ($row['fundsNeeded']) {
+				$event = new Event((int) $row['id']);
+				array_push($eventsAndPosts, $event);
+
+			} else {
+				$post = new Post((int) $row['id']);
+				array_push($eventsAndPosts, $post);
+			}   
+		}
+
+		return $eventsAndPosts;
+	}
+
+	public function getEventsAndPostsGlobal() {
+		$connection = Database::getConnection();
+		$sql = sprintf("SELECT * FROM ( (SELECT id, poster_user_id, posted_at, NULL AS fundsNeeded FROM posts) UNION ALL (SELECT id, poster_user_id, posted_at, fundsNeeded FROM events) ) results ORDER BY posted_at DESC");
 
 		$result = mysqli_query($connection, $sql);
 		$connection->close();

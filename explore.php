@@ -8,11 +8,17 @@ require($root_dir . '/includes/dbh.inc.php');
 require($root_dir . '/classes/User.php');
 require($root_dir . '/fragments/head.php');
 require($root_dir . '/fragments/navbar.php');
+require($root_dir . '/components/explore_organisation.php');
 
-$active_user = new User((int) $_SESSION['user_id']);
+if (isset($_SESSION['user_id'])) {
+	$active_user = new User((int) $_SESSION['user_id']);
+	render_head("Explore - " . $active_user->getName());
+	render_navbar("Explore - " . $active_user->getName());
+} else {
+	render_head("Explore");
+	render_navbar("Explore");
+}
 
-render_head("Explore - " . $active_user->getName());
-render_navbar("Explore - " . $active_user->getName());
 ?>
 
 <link rel="stylesheet" href="assets/css/feed.css">
@@ -32,11 +38,12 @@ render_navbar("Explore - " . $active_user->getName());
 			<div class='col s3 white z-depth-2' style='padding: 20px; margin: 0 0 20% 0'>
 				<nav>
 					<div class="nav-wrapper">
-						<form>
+						<form action="explore.php" method="POST">
 							<div class="input-field">
-								<input class="white" placeholder="Search for organisations" id="search" type="search" required>
+								<input autocomplete="off" class="white" placeholder="Search for organisations" id="search_input" type="search" required>
 								<label class="label-icon" for="search"><i class="material-icons">search</i></label>
 								<i class="material-icons">close</i>
+								<button id="search_button" class="hide" type="submit" name="submit-search"></button>
 							</div>
 						</form>
 					</div>
@@ -44,7 +51,7 @@ render_navbar("Explore - " . $active_user->getName());
 				<h5 style="margin: 50px 0 30px 0">Sort By Category</h5>
 				<ul>
 					<?php
-					$categories = array("Clubs and communities", "Environment", "Hunger", "Poverty", "Animals");
+					$categories = Database::getCategories();
 
 					foreach ($categories as $category) {
 						echo "
@@ -61,53 +68,19 @@ render_navbar("Explore - " . $active_user->getName());
 			</div>
 
 			<!-- Center -->
-			<div class="col s9" style="margin: 0">
-					<?php
-
-					$container_style = "style='
-						padding: 20px; 
-						margin: 0 10px 10px 0;
-						width: 32%;
-						float: left;
-					'";
-
+			<div id="organisations_col" class="col s9" style="margin: 0">
+					<?php 
 					$organisations = User::getOrganisations();
 
-					foreach ($organisations as $organisation) {
-						$name = $organisation->getName();
-						$user_id = $organisation->getID();
-						$description = $organisation->getBioDesc();
-						$user_category = $organisation->getCategory();
-						$profile_picture_dirctory = $organisation->getProfilePictureDirectory();
+					foreach ($organisations as $o) {
 
-						$img_style = "style='
-							padding: 0.2px;
-							margin-top: 10px;
-							border-radius: 50%;
-							border: 2px solid #004d40;
-							width: 100px;
-							height: 100px;
-						'";
-
-						$a_options = "
-							href='profile.php?user_id=$user_id'
-							class='tooltipped' 
-							data-position='bottom' 
-							data-tooltip='Go to Profile'
-						";
-
-						echo "
-							<div class='center white z-depth-2' $container_style >
-								<div class='z-depth-1 white' style='margin-bottom: 10px; padding: 15px; border-radius: 20px'>
-									<p style='font-size: 10pt; margin: 0'><i>$user_category</i></p>
-								</div>
-								<a $a_options><img $img_style src='$profile_picture_dirctory' alt='' class='z-depth-1'></a>
-								<h5>$name</h5>
-								<div class='z-depth-1 white valign-wrapper' style='padding: 10px; margin: 0; border-radius: 20px; height: 128px'>
-									<p style='font-size: 10pt;'><i>$description</i></p>
-								</div>
-							</div>
-						";
+						echo render_explore_organisation (
+							$o->getID(), 
+							$o->getName(), 
+							$o->getBioDesc(), 
+							$o->getCategory(), 
+							$o->getProfilePictureDirectory()
+						);
 					}
 					?>
 			</div>
@@ -116,12 +89,26 @@ render_navbar("Explore - " . $active_user->getName());
 </main>
         
 <script type="text/javascript">
- 	$(document).ready(function(){
-    $('.tabs').tabs();
-    $('.collapsible').collapsible();
-    $('.modal').modal();
-    $('.tooltipped').tooltip();
-  });
+ 	$(document).ready(() => {
+	    $('.tabs').tabs();
+	    $('.collapsible').collapsible();
+	    $('.modal').modal();
+	    $('.tooltipped').tooltip();
+
+	    $org_col = $('#organisations_col').html();
+	    
+	    $('#search_input').on("input", () => {
+	    	$search = $('#search_input').val();
+
+	    	if ($search.length > 0) {
+	    		$.get('includes/search.inc.php', {'search': $search}, ($data) => {
+	    			$('#organisations_col').html($data);
+	    		});
+	    	} else {
+	    		$('#organisations_col').html($org_col);
+	    	}
+	    });
+	});
 </script> 
 
 <?php 

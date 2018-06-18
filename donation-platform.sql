@@ -22,7 +22,7 @@ CREATE TABLE donators_info (
     id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	user_id int(11) NOT NULL,
 	profile_picture_directory varchar(128),
-	profile_bio varchar(128)
+	profile_bio varchar(256)
 
 	-- FOREIGN KEY (user_id) REFERENCES users (id)
 );
@@ -31,7 +31,7 @@ CREATE TABLE organisations_info (
     id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	user_id int(11) NOT NULL,
 	profile_picture_directory varchar(128),
-	profile_description varchar(128),
+	profile_description varchar(256),
 	category varchar(128)
 
 	-- FOREIGN KEY (user_id) REFERENCES users (id)
@@ -111,6 +111,18 @@ CREATE TABLE events_donations (
 	FOREIGN KEY (donator_user_id) REFERENCES users (id)
 );
 
+
+CREATE TABLE categories (
+	id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	category varchar(128) NOT NULL
+);
+
+INSERT INTO categories (category) VALUES ("Clubs and Communities");
+INSERT INTO categories (category) VALUES ("Environment");
+INSERT INTO categories (category) VALUES ("Hunger");
+INSERT INTO categories (category) VALUES ("Poverty");
+INSERT INTO categories (category) VALUES ("Animal & Pet Welfare");
+
 INSERT INTO users (id, name, email, password, type) 
 VALUES (1, 'John Smith', 'john@gmail.com', '$2y$10$IH/0ugqbuVVlev.rA6haM.vvRepgLTyOmzM58j194Em0aYqjcbMy6', 'D');
 
@@ -118,7 +130,7 @@ INSERT INTO donators_info (user_id, profile_picture_directory, profile_bio)
 VALUES (1, 'assets/img/profile_pictures/default_profile_picture.jpg', 'I am from KL, Malaysia. Follow me!');
 
 INSERT INTO users (id, name, email, password, type) 
-VALUES (2, 'GiveWell', 'john@gmail.com', '$2y$10$IH/0ugqbuVVlev.rA6haM.vvRepgLTyOmzM58j194Em0aYqjcbMy6', 'O');
+VALUES (2, 'GiveWell', 'givewell@gmail.com', '$2y$10$IH/0ugqbuVVlev.rA6haM.vvRepgLTyOmzM58j194Em0aYqjcbMy6', 'O');
 
 INSERT INTO organisations_info (user_id, profile_picture_directory, profile_description, category) 
-VALUES (2, "assets/img/profile_pictures/default_profile_picture.jpg", "We find outstanding charities and publish the full details of our analysis to help donors decide where to give.", "International");
+VALUES (2, "assets/img/profile_pictures/default_profile_picture.jpg", "We find outstanding charities and publish the full details of our analysis to help donors decide where to give.", "Poverty");
