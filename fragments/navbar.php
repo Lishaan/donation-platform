@@ -44,7 +44,7 @@ function render_navbar($activepage) { ?>
 			</nav>
 		</div>
 		<script type="text/javascript">
-			$(document).ready(function(){
+			$(document).ready(() => {
 				$(".dropdown-trigger").dropdown();
 			});
 		</script>

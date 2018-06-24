@@ -11,8 +11,22 @@ require($root_dir . '/fragments/navbar.php');
 
 $active_user = new User((int) $_SESSION['user_id']);
 
-render_head("Feed - " . $active_user->getName());
-render_navbar("Feed - " . $active_user->getName());
+if (isset($_SESSION['user_id'])) {
+	$active_user = new User((int) $_SESSION['user_id']);
+	render_head("Feed - " . $active_user->getName());
+	render_navbar("Feed - " . $active_user->getName());
+} else {
+	render_head("Feed");
+	render_navbar("Feed");
+}
+
+if ($_GET['login'] === "required") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'Please login to perform that action'})
+	</script>
+	<?php
+}
 ?>
 
 <link rel="stylesheet" href="assets/css/feed.css">
@@ -21,8 +35,8 @@ render_navbar("Feed - " . $active_user->getName());
 		<div class="col s12">
 			<ul class="tabs z-depth-1">
 				<li class="col s3"></li>
-				<li class="tab col s3"><a class="active" href="#following">Following</a></li>
-				<li class="tab col s3"><a href="#global">Global</a></li>
+				<li class="tab col s3"><a class="<?php echo User::isLoggedIn() ? "active" : '' ?>" href="#following">Following</a></li>
+				<li class="tab col s3"><a class="<?php echo !User::isLoggedIn() ? "active" : '' ?>" href="#global">Global</a></li>
 				<li class="col s3"></li>
 			</ul>
 		</div>
@@ -51,6 +65,12 @@ render_navbar("Feed - " . $active_user->getName());
 					$post_event->render($post_event->getPosterUser(), $active_user, "&goback=feed");
 				}
 
+				$message = "No Posts or Events";
+
+				if (!isset($_SESSION['user_id'])) {
+					$message = "Please <a href='index.php?form=login'>login</a> to see events and posts of your followings";
+				}
+
 				if (empty($posts_and_events)) {
 					echo ("
 						<div class='row'>
@@ -58,7 +78,7 @@ render_navbar("Feed - " . $active_user->getName());
 								<span class='black-text'>
 									<div>
 										<text style='font-size: 12pt'>
-											No Posts or Events
+											$message
 										</text>
 									</div>
 								</span>
@@ -112,7 +132,7 @@ render_navbar("Feed - " . $active_user->getName());
 </main>
         
 <script type="text/javascript">
- 	$(document).ready(function(){
+ 	$(document).ready(() => {
     $('.tabs').tabs();
     $('.collapsible').collapsible();
     $('.modal').modal();

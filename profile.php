@@ -125,11 +125,21 @@ render_navbar("Profile - " . $user->getName());
 												          <textarea placeholder="Required" autocomplete="false" name="body" id="event_textarea" class="materialize-textarea" data-length="512"></textarea>
 												          <label for="event_textarea">Description</label>
 												        </div>
-												        
+
 												        <div class="input-field">
-													        <input placeholder = "Required" autocomplete="false"  name="fundsNeeded" id="event_funds_Needed" type="number" data-length="11">
+													        <input placeholder = "Required" autocomplete="false"  name="fundsNeeded" onkeypress="return isNumberKey(event)" id="event_funds_Needed" type="number" data-length="11">
 		            										<label for="input_text">Funds Needed</label>
 												        </div>
+<!-- 
+														<div class="file-field input-field" style="margin: 40px 0 40px 0">
+															<div class="btn">
+																<span>Upload an image</span>
+																<input name="event_image" type="file">
+															</div>
+															<div class="file-path-wrapper">
+																<input class="file-path validate" type="text" placeholder="JPG and PNG only (Required)">
+															</div>
+														</div> -->
 														
 												        <button disabled style="margin-top: 20px" class="btn waves-effect waves-light btn-large" type="submit" name="submit_event" id="event_submit">Submit
 														    <i class="material-icons right">send</i>
@@ -155,7 +165,7 @@ render_navbar("Profile - " . $user->getName());
 					if (empty($posts)) {
 						echo ("
 							<div class='row'>
-								<div class='white z-depth-2' style='padding: 20px 20px 20px 20px; margin: 0 10px -10px 10px;'>
+								<div class='white z-depth-2' style='padding: 20px; margin: 0 10px -10px 10px;'>
 									<span class='black-text'>
 										<div>
 											<text style='font-size: 12pt'>
@@ -288,12 +298,21 @@ render_navbar("Profile - " . $user->getName());
 		};
 
 		function eventCheck() {
-			if ($('#event_textarea').val().length > 0 && $('#event_funds_Needed').val().length > 0) {
+			if ($('#event_textarea').val().length > 0 && $('#event_funds_Needed').val() > 0) {
 				$('#event_submit').prop("disabled", false);
 			} else {
 				$('#event_submit').prop("disabled", true);
 			}
 		};
+
+		function isNumberKey(evt) {
+			var charCode = (evt.which) ? evt.which : evt.keyCode;
+			if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+				return false;
+			} else {
+				return true;
+			}
+		}
 	});
 </script>
 <?php

@@ -117,7 +117,7 @@
 </div>
 
 <script type="text/javascript">
-	$(document).ready(function(){
+	$(document).ready(() => {
 		$('.tabs').tabs();
 		$('select').formSelect();
 	});

@@ -69,7 +69,7 @@ if (isset($_POST['submit']) and isset($_GET['type'])) {
 
 				echo ("
 					<script type='text/javascript'> 
-						window.location.href='../index.php?signup=success';
+						window.location.href='../index.php?form=login&signup=success';
 					</script>
 				");
 			}

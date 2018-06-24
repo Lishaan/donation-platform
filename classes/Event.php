@@ -150,7 +150,7 @@ class Event {
 			border-radius: 50%;
 			float: left;
 			margin: 0 20px 0 0;
-			padding: 0.2px;
+			padding: 0.1px;
 
 			user-drag: none; 
 			user-select: none;
@@ -369,9 +369,9 @@ class Event {
 			$like_button = $unlike_button;
 		}
 
-		// if ($_SESSION['user_id'] === $user_id) {
-		// 	$like_button = $like_button_disabled;
-		// }
+		if ($_SESSION['user_id'] === $user_id) {
+			$like_button = $like_button_disabled;
+		}
 
 		return $like_button;
 	}

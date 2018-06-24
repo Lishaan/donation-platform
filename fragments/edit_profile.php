@@ -136,7 +136,7 @@ if ($_GET['upload-file'] === "file-type") {
 				<div class="row">
 					<?php $biodesc = $active_user->isDonator() ? "Bio" : "Description" ?>
 					<div class="input-field col s12">
-						<textarea placeholder="Change Your <?php echo $biodesc ?>" autocomplete="false" name="biodesc" id="post_textarea" class="materialize-textarea" data-length="80"><?php echo $active_user->getBioDesc() ?></textarea>
+						<textarea placeholder="Change Your <?php echo $biodesc ?>" autocomplete="false" name="biodesc" id="post_textarea" class="materialize-textarea" data-length="256"><?php echo $active_user->getBioDesc() ?></textarea>
 						<label for="post_textarea"><?php echo $biodesc ?></label>
 					</div>
 				</div>

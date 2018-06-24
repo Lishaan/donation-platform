@@ -135,7 +135,7 @@ require($root_dir . '/components/home_event.php');
 </div>
 
 <script type="text/javascript">
-	window.onload = function(){
+	window.onload = () => {
 		let id = 0;
 		for (let p of percentages) {
 			move(p, id);
@@ -159,7 +159,7 @@ require($root_dir . '/components/home_event.php');
 		}
 	}
 
-	$(document).ready(function() {
+	$(document).ready(() => {
 		$('.parallax').parallax();
 		$('.carousel').carousel();
 		$('.carousel.carousel-slider').carousel({

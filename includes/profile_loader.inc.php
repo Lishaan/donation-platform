@@ -3,6 +3,14 @@
 require($root_dir . '/includes/dbh.inc.php');
 require($root_dir . '/classes/User.php');
 
+if ($_GET['login'] === "required") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'Please login to perform that action'})
+	</script>
+	<?php
+}
+
 if ($_GET['create_post'] === "success") {
 	?>
 	<script type="text/javascript">
@@ -79,6 +87,71 @@ if (isset($_GET['user_id'])) {
 
 		// Submit event
 		if (isset($_POST['submit_event'])) {
+			if (!empty($_FILES['event_image']['tmp_name'])) {
+				die("Dsds");
+				// define('MB', 1048576);
+
+				// $file = $_FILES['profile_picture_image'];
+
+				// $file_name = $file['name'];
+				// $file_type = $file['type'];
+				// $file_size = $file['size'];
+				// $file_error = $file['error'];
+				// $file_tmp_dir = $file['tmp_name'];
+
+				// $file_extension = strtolower(end(explode('.', $file_name)));
+
+				// $allowed_extensions = array('jpg', 'jpeg', 'png');
+
+				// if (in_array($file_extension, $allowed_extensions)) {
+				// 	if ($file_error === 0) {
+				// 		if ($file_size <= 2*MB) {
+				// 			$file_unique_name = sprintf("profile_picture_uid_%d", $active_user->getID());
+				// 			$file_name_new = "$file_unique_name.$file_extension";
+
+				// 			$file_destination = "assets/img/profile_pictures/$file_name_new";
+				// 			move_uploaded_file($file_tmp_dir, $file_destination);
+							
+				// 			if ($active_user->isDonator()) {
+				// 				$sql = "UPDATE donators_info SET profile_picture_directory='$file_destination' WHERE user_id=$user_id";
+				// 				mysqli_query($connection, $sql);
+				// 			} else {
+				// 				$sql = "UPDATE organisations_info SET profile_picture_directory='$file_destination' WHERE user_id=$user_id";
+				// 				mysqli_query($connection, $sql);
+				// 			}
+
+				// 			$link = "profile.php?user_id=$user_id&edit-profile=true&upload-file=success";
+				// 			echo ("
+				// 				<script type='text/javascript'> 
+				// 					window.location.href='$link';
+				// 				</script>
+				// 			");
+
+				// 		} else {
+				// 			$link = "profile.php?user_id=$user_id&edit-profile=true&upload-file=file-size";
+				// 			echo ("
+				// 				<script type='text/javascript'> 
+				// 					window.location.href='$link';
+				// 				</script>
+				// 			");
+				// 		}
+				// 	} else {
+				// 		$link = "profile.php?user_id=$user_id&edit-profile=true&upload-file=file-error";
+				// 		echo ("
+				// 			<script type='text/javascript'> 
+				// 				window.location.href='$link';
+				// 			</script>
+				// 		");
+				// 	}
+				// } else {
+				// 	$link = "profile.php?user_id=$user_id&edit-profile=true&upload-file=file-type";
+				// 	echo ("
+				// 		<script type='text/javascript'> 
+				// 			window.location.href='$link';
+				// 		</script>
+				// 	");
+				// }
+			}
 			$active_user->createEvent($_POST['title'], $_POST['body'], $_POST['fundsNeeded']);
 		}
 
@@ -94,31 +167,11 @@ if (isset($_GET['user_id'])) {
 
 		// Submit Comment
 		if (isset($_POST['post_comment'])) {
-			$post_id = $_GET['post_id'];
-			$commenter_user_id = $_SESSION['user_id'];
-			$comment_body = $_POST['comment_body'];
-
-			$sql = "SELECT * FROM posts WHERE id=$post_id";
-			$result = mysqli_query($connection, $sql);
-
-			if (mysqli_num_rows($result) > 0) {
-				$sql = "INSERT INTO comments (post_id, commenter_user_id, comment_body, posted_at) VALUES ($post_id, $commenter_user_id, '$comment_body', now())";
-				mysqli_query($connection, $sql);
-			}
+			$active_user->commentPost((int) $_GET['post_id'], (string) $_POST['comment_body']);
 		}
 
 		if (isset($_POST['event_comment'])) {
-			$event_id = $_GET['event_id'];
-			$commenter_user_id = $_SESSION['user_id'];
-			$comment_body = $_POST['comment_body'];
-
-			$sql = "SELECT * FROM events WHERE id=$event_id";
-			$result = mysqli_query($connection, $sql);
-
-			if (mysqli_num_rows($result) > 0) {
-				$sql = "INSERT INTO comments (event_id, commenter_user_id, comment_body, posted_at) VALUES ($event_id, $commenter_user_id, '$comment_body', now())";
-				mysqli_query($connection, $sql);
-			}
+			$active_user->commentEvent((int) $_GET['event_id'], (string) $_POST['comment_body']);
 		}
 
 		// Settings -> Edit Profile
@@ -242,10 +295,18 @@ if (isset($_GET['goback'])) {
 
 	if (isset($_GET['event_id'])) {
 		$args .= "event_id=" . $_GET['event_id'];
+
+		if (isset($_GET['login'])) {
+			$args .= "&login=" . $_GET['login'];
+		}
 	}
 
 	if (isset($_GET['post_id'])) {
 		$args .= "post_id=" . $_GET['post_id'];
+
+		if (isset($_GET['login'])) {
+			$args .= "&login=" . $_GET['login'];
+		}
 	}
 
 	echo ("
@@ -278,12 +339,12 @@ function render_profile_info(User $user, $following) {
 				<!-- Follow Button -->
 				<form action='../profile.php?user_id=$user_id' method='POST' accept-charset='utf-8'>
 	");
-	if ($following and $_SESSION['user_id'] !== $user_id) {
+	if ($following and isset($_SESSION['user_id']) and $_SESSION['user_id'] !== $user_id) {
 		echo ("
 					<button class='btn waves-effect waves-light' style='margin-top: 40px;' type='submit' name='unfollow' value='Unfollow'>Unfollow<i class='material-icons right'>person_outline</i>
 				  	</button>
 		");
-	} else if (!$following and $_SESSION['user_id'] !== $user_id) {
+	} else if (!$following and isset($_SESSION['user_id']) and $_SESSION['user_id'] !== $user_id) {
 		echo ("
 					<button class='btn waves-effect waves-light' style='margin-top: 40px;' type='submit' name='follow' value='Follow'>Follow<i class='material-icons right'>person_add</i>
 					</button>

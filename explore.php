@@ -26,7 +26,7 @@ if (isset($_SESSION['user_id'])) {
 	<div class="row" style="margin-bottom: 10px">
 		<div class="col s12">
 			<div class="white z-depth-1 center" style="padding: 10px">
-				<h5 style="padding: 10px; margin: 0;">Explore Organisations</h5>
+				<h5 id="explore_organisations" style="padding: 10px; margin: 0;">Explore Organisations</h5>
 			</div>
 		</div>
 	</div>
@@ -57,7 +57,7 @@ if (isset($_SESSION['user_id'])) {
 						echo "
 							<li style='margin: 0 0 10px 0;'>
 								<label>
-									<input type='checkbox' class='filled-in' />
+									<input type='checkbox' class='filled-in' value='$category'/>
 									<span>$category</span>
 								</label>
 							</li>
@@ -69,45 +69,62 @@ if (isset($_SESSION['user_id'])) {
 
 			<!-- Center -->
 			<div id="organisations_col" class="col s9" style="margin: 0">
-					<?php 
-					$organisations = User::getOrganisations();
+				<?php 
+				$organisations = User::getOrganisations();
 
-					foreach ($organisations as $o) {
+				foreach ($organisations as $o) {
 
-						echo render_explore_organisation (
-							$o->getID(), 
-							$o->getName(), 
-							$o->getBioDesc(), 
-							$o->getCategory(), 
-							$o->getProfilePictureDirectory()
-						);
-					}
-					?>
+					echo render_explore_organisation (
+						$o->getID(), 
+						$o->getName(), 
+						$o->getBioDesc(), 
+						$o->getCategory(), 
+						$o->getProfilePictureDirectory()
+					);
+				}
+				?>
 			</div>
 		</div>
 	</div>
 </main>
-        
+
 <script type="text/javascript">
- 	$(document).ready(() => {
-	    $('.tabs').tabs();
-	    $('.collapsible').collapsible();
-	    $('.modal').modal();
-	    $('.tooltipped').tooltip();
+	$(document).ready(() => {
+		$('.tabs').tabs();
+		$('.collapsible').collapsible();
+		$('.modal').modal();
+		$('.tooltipped').tooltip();
 
-	    $org_col = $('#organisations_col').html();
-	    
-	    $('#search_input').on("input", () => {
-	    	$search = $('#search_input').val();
+		$org_col = $('#organisations_col').html();
 
-	    	if ($search.length > 0) {
-	    		$.get('includes/search.inc.php', {'search': $search}, ($data) => {
-	    			$('#organisations_col').html($data);
-	    		});
-	    	} else {
-	    		$('#organisations_col').html($org_col);
-	    	}
-	    });
+		$('#search_input').on("input", () => {
+			$search = $('#search_input').val();
+
+			if ($search.length > 0) {
+				$.get('includes/search.inc.php', {'search': $search}, ($data) => {
+					$('#organisations_col').html($data);
+				});
+			} else {
+				$('#organisations_col').html($org_col);
+			}
+		});
+
+		$('input[type="checkbox"]').on("change", function() {
+			$('input[type="checkbox"]').not(this).prop('checked', false);
+
+			if ($(this).is(":checked")) {
+				$category = $('input[type="checkbox"]:checked').val();
+
+				$.get('includes/search.inc.php', {'category': $category}, ($data) => {
+					if ($data) {
+						$('#organisations_col').html($data);
+					}
+				});
+			} else {
+				$('#organisations_col').html($org_col);
+			}
+
+		});
 	});
 </script> 
 

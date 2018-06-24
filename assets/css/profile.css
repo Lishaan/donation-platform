@@ -29,6 +29,7 @@ body {
 	border-radius: 150px;
 	border-color: #004d40;
 	z-index: 2;
+	background-color: white;
 }
 
 .tabs .tab a,

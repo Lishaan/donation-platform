@@ -25,7 +25,20 @@ class User {
 			$this->email = $row['email'];
 			$this->type = $row['type'];
 		} else {
-			die("User unable to construct");
+			if (!User::isLoggedIn()) {
+				if (isset($_GET['user_id'])) {
+					$this->__construct($_GET['user_id']);
+				} else if (isset($_GET['event_id'])) {
+					echo ("
+						<script type='text/javascript'> 
+							window.location.href='$_SERVER[REQUEST_URI]&login=required';
+						</script>
+					");
+					echo "Dd";
+				}
+			} else {
+				die("User unable to construct");
+			}
 		}
 	}
 
@@ -59,7 +72,7 @@ class User {
 
 	public function getFollowersArray() {
 		$connection = Database::getConnection();
-		$sql = sprintf("SELECT * FROM followers WHERE user_id=%d ORDER BY id DESC", $this->getID());
+		$sql = sprintf("SELECT * FROM followers WHERE user_id=%d ORDER BY follow_date DESC", $this->getID());
 		$result = mysqli_query($connection, $sql);
 		$connection->close();
 
@@ -217,39 +230,79 @@ class User {
 		$user_id = $this->id;
 		echo ("
 			<script type='text/javascript'> 
-			window.location.href='../profile.php?user_id=$user_id&delete_post=success';
+				window.location.href='../profile.php?user_id=$user_id&delete_post=success';
 			</script>
-			");
+		");
 	}
 
 	public function likePost(int $post_id) {
-		$connection = Database::getConnection();
-		$liker_user_id = $this->id;
-		$sql = "SELECT * FROM posts_likes WHERE post_id=$post_id AND user_id=$liker_user_id";
-		$result = mysqli_query($connection, $sql);
+		if (isset($_SESSION['user_id'])) {
+			$connection = Database::getConnection();
+			$liker_user_id = $this->id;
+			$sql = "SELECT * FROM posts_likes WHERE post_id=$post_id AND user_id=$liker_user_id";
+			$result = mysqli_query($connection, $sql);
 
-		if (mysqli_num_rows($result) <= 0) {
-			$sql = "UPDATE posts SET likes=likes+1 WHERE id=" . $_GET['post_id'];
-			mysqli_query($connection, $sql);
+			if (mysqli_num_rows($result) <= 0) {
+				$sql = "UPDATE posts SET likes=likes+1 WHERE id=" . $_GET['post_id'];
+				mysqli_query($connection, $sql);
 
-			$sql = "INSERT INTO posts_likes (post_id, user_id) VALUES ($post_id, $liker_user_id)";
-			mysqli_query($connection, $sql);
+				$sql = "INSERT INTO posts_likes (post_id, user_id) VALUES ($post_id, $liker_user_id)";
+				mysqli_query($connection, $sql);
+			} else {
+				$sql = "UPDATE posts SET likes=likes-1 WHERE id=" . $_GET['post_id'];
+				mysqli_query($connection, $sql);
+
+				$sql = "DELETE FROM posts_likes WHERE post_id=$post_id AND user_id=$liker_user_id";
+				mysqli_query($connection, $sql);
+			}
+			$connection->close();
 		} else {
-			$sql = "UPDATE posts SET likes=likes-1 WHERE id=" . $_GET['post_id'];
-			mysqli_query($connection, $sql);
-
-			$sql = "DELETE FROM posts_likes WHERE post_id=$post_id AND user_id=$liker_user_id";
-			mysqli_query($connection, $sql);
+			echo ("
+				<script type='text/javascript'> 
+					window.location.href='$_SERVER[REQUEST_URI]&login=required';
+				</script>
+			");
 		}
-		$connection->close();
+	}
+
+	public function commentPost(int $post_id, string $comment_body) {
+		if (User::isLoggedIn() and !empty($comment_body)) {
+			$connection = Database::getConnection();
+			$commenter_user_id = $this->id;
+
+			$sql = "SELECT * FROM posts WHERE id=$post_id";
+			$result = mysqli_query($connection, $sql);
+
+			if (mysqli_num_rows($result) > 0) {
+				$sql = "INSERT INTO comments (post_id, commenter_user_id, comment_body, posted_at) VALUES ($post_id, $commenter_user_id, '$comment_body', now())";
+				mysqli_query($connection, $sql);
+			}
+			$connection->close();
+		} else {
+			echo ("
+				<script type='text/javascript'> 
+					window.location.href='$_SERVER[REQUEST_URI]&login=required';
+				</script>
+			");
+		}
 	}
 
 	public function createEvent(string $title, string $body, int $fundsNeeded) {
 		$connection = Database::getConnection();
-		$sql = sprintf("INSERT INTO events (poster_user_id, posted_at, likes, title, body, fundsNeeded, fundsGathered) VALUES (%d, now(), 0, '%s', '%s', %d, 0)", $this->id, mysqli_real_escape_string($connection, $title), mysqli_real_escape_string($connection, $body), $fundsNeeded);
+
+		$image_directory = "test";
+
+		$poster_user_id = $this->id;
+		$title = mysqli_real_escape_string($connection, $title);
+		$fundsNeeded = mysqli_real_escape_string($connection, $fundsNeeded);
+
+		$sql = "
+			INSERT INTO events (image_directory, poster_user_id, posted_at, likes, title, body, fundsNeeded, fundsGathered) 
+			VALUES ('$image_directory', $poster_user_id, now(), 0, '$title', '$body', $fundsNeeded, 0)
+		";
+		
 		mysqli_query($connection, $sql);
 		$connection->close();
-
 		$user_id = $this->id;
 		echo ("
 			<script type='text/javascript'> 
@@ -280,25 +333,66 @@ class User {
 	}
 
 	public function likeEvent(int $event_id) {
-		$connection = Database::getConnection();
-		$liker_user_id = $this->id;
-		$sql = "SELECT * FROM events_likes WHERE event_id=$event_id AND user_id=$liker_user_id";
-		$result = mysqli_query($connection, $sql);
+		if (isset($_SESSION['user_id'])) {
+			$connection = Database::getConnection();
+			$liker_user_id = $this->id;
+			$sql = "SELECT * FROM events_likes WHERE event_id=$event_id AND user_id=$liker_user_id";
+			$result = mysqli_query($connection, $sql);
 
-		if (mysqli_num_rows($result) <= 0) {
-			$sql = "UPDATE events SET likes=likes+1 WHERE id=" . $_GET['event_id'];
-			mysqli_query($connection, $sql);
+			if (mysqli_num_rows($result) <= 0) {
+				$sql = "UPDATE events SET likes=likes+1 WHERE id=" . $_GET['event_id'];
+				mysqli_query($connection, $sql);
 
-			$sql = "INSERT INTO events_likes (event_id, user_id) VALUES ($event_id, $liker_user_id)";
-			mysqli_query($connection, $sql);
+				$sql = "INSERT INTO events_likes (event_id, user_id) VALUES ($event_id, $liker_user_id)";
+				mysqli_query($connection, $sql);
+			} else {
+				$sql = "UPDATE events SET likes=likes-1 WHERE id=" . $_GET['event_id'];
+				mysqli_query($connection, $sql);
+
+				$sql = "DELETE FROM events_likes WHERE event_id=$event_id AND user_id=$liker_user_id";
+				mysqli_query($connection, $sql);
+			}
+			$connection->close();
 		} else {
-			$sql = "UPDATE events SET likes=likes-1 WHERE id=" . $_GET['event_id'];
-			mysqli_query($connection, $sql);
+					$goback = "";
 
-			$sql = "DELETE FROM events_likes WHERE event_id=$event_id AND user_id=$liker_user_id";
-			mysqli_query($connection, $sql);
+		if (isset($_GET['goback'])) {
+			$goback = "&goback=" . $_GET['goback'];
 		}
-		$connection->close();
+
+		if (isset($_GET['event_id'])) {
+			$goback .= "&event_id=" . $_GET['event_id'];
+		}
+			echo ("
+				<script type='text/javascript'> 
+					window.location.href='$_SERVER[REQUEST_URI]';
+				</script>
+			");
+		}
+	}
+
+	public function commentEvent(int $event_id, string $comment_body) {
+		if (isset($_SESSION['user_id'])) {
+			if (User::isLoggedIn() and !empty($comment_body)) {
+				$connection = Database::getConnection();
+				$commenter_user_id = $this->id;
+
+				$sql = "SELECT * FROM events WHERE id=$event_id";
+				$result = mysqli_query($connection, $sql);
+
+				if (mysqli_num_rows($result) > 0) {
+					$sql = "INSERT INTO comments (event_id, commenter_user_id, comment_body, posted_at) VALUES ($event_id, $commenter_user_id, '$comment_body', now())";
+					mysqli_query($connection, $sql);
+				}
+				$connection->close();
+			}
+		} else {
+			echo ("
+				<script type='text/javascript'> 
+					window.location.href='$_SERVER[REQUEST_URI]&login=required';
+				</script>
+			");
+		}
 	}
 
 	public function donateEvent(int $event_id, float $donation_amount, int $user_id) {
@@ -444,9 +538,18 @@ class User {
 			} else {
 				return false;
 			}
+		} else if (!isset($_SESSION['user_id']) and isset($_GET['user_id'])) {
+			return true;
 		} else {
 			die("Please login");
 		}
 	}
 
+	public static function isLoggedIn() {
+		if (isset($_SESSION['user_id'])) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

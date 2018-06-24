@@ -290,7 +290,7 @@ class Post {
 		";
 
 		$like_button_disabled = "
-			<div style='margin-bottom: 20px;'> 
+			<div style='margin-bottom: 20px'> 
 				<form action='profile.php?user_id=$user_id&post_id=$post_id' method='POST'>
 			        <button $style class='z-depth-2 btn waves-effect' type='submit' name='like_post' disabled>$likes
 						<i style='border-radius: 10px;' class='material-icons right'>thumb_up</i>
@@ -318,9 +318,9 @@ class Post {
 			$like_button = $unlike_button;
 		}
 
-		// if ($_SESSION['user_id'] === $user_id) {
-		// 	$like_button = $like_button_disabled;
-		// }
+		if ($_SESSION['user_id'] === $user_id) {
+			$like_button = $like_button_disabled;
+		}
 
 		return $like_button;
 	}

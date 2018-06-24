@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS donators_info;
 DROP TABLE IF EXISTS organisations_info;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS categories;
 
 CREATE TABLE users (
     id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -79,6 +80,7 @@ CREATE TABLE posts_likes (
 
 CREATE TABLE events (
 	id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	image_directory varchar(128) NOT NULL,
 	poster_user_id int(11) NOT NULL,
 	posted_at datetime NOT NULL,
 
@@ -117,20 +119,8 @@ CREATE TABLE categories (
 	category varchar(128) NOT NULL
 );
 
-INSERT INTO categories (category) VALUES ("Clubs and Communities");
+INSERT INTO categories (category) VALUES ("Animal and Pet Welfare");
 INSERT INTO categories (category) VALUES ("Environment");
-INSERT INTO categories (category) VALUES ("Hunger");
+INSERT INTO categories (category) VALUES ("Education");
 INSERT INTO categories (category) VALUES ("Poverty");
-INSERT INTO categories (category) VALUES ("Animal & Pet Welfare");
-
-INSERT INTO users (id, name, email, password, type) 
-VALUES (1, 'John Smith', 'john@gmail.com', '$2y$10$IH/0ugqbuVVlev.rA6haM.vvRepgLTyOmzM58j194Em0aYqjcbMy6', 'D');
-
-INSERT INTO donators_info (user_id, profile_picture_directory, profile_bio) 
-VALUES (1, 'assets/img/profile_pictures/default_profile_picture.jpg', 'I am from KL, Malaysia. Follow me!');
-
-INSERT INTO users (id, name, email, password, type) 
-VALUES (2, 'GiveWell', 'givewell@gmail.com', '$2y$10$IH/0ugqbuVVlev.rA6haM.vvRepgLTyOmzM58j194Em0aYqjcbMy6', 'O');
-
-INSERT INTO organisations_info (user_id, profile_picture_directory, profile_description, category) 
-VALUES (2, "assets/img/profile_pictures/default_profile_picture.jpg", "We find outstanding charities and publish the full details of our analysis to help donors decide where to give.", "Poverty");
+INSERT INTO categories (category) VALUES ("Hunger");
