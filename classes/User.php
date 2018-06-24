@@ -287,10 +287,8 @@ class User {
 		}
 	}
 
-	public function createEvent(string $title, string $body, int $fundsNeeded) {
+	public function createEvent(string $title, string $body, int $fundsNeeded, string $image_directory) {
 		$connection = Database::getConnection();
-
-		$image_directory = "test";
 
 		$poster_user_id = $this->id;
 		$title = mysqli_real_escape_string($connection, $title);
@@ -308,7 +306,7 @@ class User {
 			<script type='text/javascript'> 
 			window.location.href='../profile.php?user_id=$user_id&create_event=success';
 			</script>
-			");
+		");
 	}
 
 	public function deleteEvent(int $event_id) {
@@ -354,15 +352,15 @@ class User {
 			}
 			$connection->close();
 		} else {
-					$goback = "";
+			$goback = "";
 
-		if (isset($_GET['goback'])) {
-			$goback = "&goback=" . $_GET['goback'];
-		}
+			if (isset($_GET['goback'])) {
+				$goback = "&goback=" . $_GET['goback'];
+			}
 
-		if (isset($_GET['event_id'])) {
-			$goback .= "&event_id=" . $_GET['event_id'];
-		}
+			if (isset($_GET['event_id'])) {
+				$goback .= "&event_id=" . $_GET['event_id'];
+			}
 			echo ("
 				<script type='text/javascript'> 
 					window.location.href='$_SERVER[REQUEST_URI]';

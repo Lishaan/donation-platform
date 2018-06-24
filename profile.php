@@ -115,9 +115,9 @@ render_navbar("Profile - " . $user->getName());
 
 											<div id="Event" >
 												<div style="padding: 0 20px 0 20px">
-													<form action="profile.php?user_id=<?php echo $user->getID() ?>" method="POST">
+													<form action="profile.php?user_id=<?php echo $user->getID() ?>" method="POST" enctype="multipart/form-data">
 														<div class="input-field" style="margin-bottom: 50px">
-												          <input placeholder="(Optional)" autocomplete="false" name="title" id="event_title" type="text" class="validate" data-length="32">
+												          <input autocomplete="false" placeholder="(Optional)" name="title" id="event_title" type="text" class="validate" data-length="32">
 												          <label for="event_title">Title</label>
 												        </div>
 
@@ -130,16 +130,16 @@ render_navbar("Profile - " . $user->getName());
 													        <input placeholder = "Required" autocomplete="false"  name="fundsNeeded" onkeypress="return isNumberKey(event)" id="event_funds_Needed" type="number" data-length="11">
 		            										<label for="input_text">Funds Needed</label>
 												        </div>
-<!-- 
+
 														<div class="file-field input-field" style="margin: 40px 0 40px 0">
 															<div class="btn">
 																<span>Upload an image</span>
-																<input name="event_image" type="file">
+																<input id="event_image" name="event_image" type="file">
 															</div>
 															<div class="file-path-wrapper">
 																<input class="file-path validate" type="text" placeholder="JPG and PNG only (Required)">
 															</div>
-														</div> -->
+														</div>
 														
 												        <button disabled style="margin-top: 20px" class="btn waves-effect waves-light btn-large" type="submit" name="submit_event" id="event_submit">Submit
 														    <i class="material-icons right">send</i>
@@ -286,6 +286,7 @@ render_navbar("Profile - " . $user->getName());
 		$('#post_textarea').on("keyup", postCheck);
 		$('#event_textarea').on("keyup", eventCheck);
 		$('#event_funds_Needed').on("keyup", eventCheck);
+		$('#event_image').on("change", eventCheck);
 
 		$('.tabs').tabs('updateTabIndicator');
 
@@ -298,7 +299,7 @@ render_navbar("Profile - " . $user->getName());
 		};
 
 		function eventCheck() {
-			if ($('#event_textarea').val().length > 0 && $('#event_funds_Needed').val() > 0) {
+			if ($('#event_textarea').val().length > 0 && $('#event_funds_Needed').val() > 0 && $('#event_image').val()) {
 				$('#event_submit').prop("disabled", false);
 			} else {
 				$('#event_submit').prop("disabled", true);

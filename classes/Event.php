@@ -2,6 +2,7 @@
 
 class Event {
 	private $id;
+	private $image_directory;
 	private $poster_user;
 	private $posted_at;
 	private $likes;
@@ -21,6 +22,7 @@ class Event {
 		if (mysqli_num_rows($result) > 0) {
 			$row = mysqli_fetch_assoc($result);
 			$this->id = $row['id'];
+			$this->image_directory = $row['image_directory'];
 			$this->poster_user = new User((int) $row['poster_user_id']);
 			$this->posted_at = $row['posted_at'];
 			$this->likes = $row['likes'];
@@ -142,6 +144,7 @@ class Event {
 		}
 
 		$profile_picture_directory = $this->poster_user->getProfilePictureDirectory();
+		$event_image_directory = $this->getImageDirectory();
 
 		$image_style = "style='
 			height: 55px;
@@ -172,6 +175,28 @@ class Event {
 			href='event.php?event_id=$event_id' 
 			style='color: inherit;'
 		";
+
+		$event_image_style = "style='
+			background-size: cover;
+		    background-position: center;
+		    top: 0;
+		    bottom: 0;
+		    width: 100%;
+
+			user-drag: none; 
+			user-select: none;
+			-moz-user-select: none;
+			-webkit-user-drag: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		'";
+
+		$event_image_options = "
+			src='$event_image_directory' 
+			alt='event_image'
+			$event_image_style
+			class='center'
+		";
 		
 		echo ("
 					<!-- Event -->
@@ -196,8 +221,10 @@ class Event {
 							<p style='font-size: 14pt; line-height: 5px;'><b>$title</b></p>
 							<p>$body</p>
 						</div>
+						<div class='z-depth-1' style='margin: 0 auto; padding: 10px 20px 10px 20px'>
+							<img $event_image_options >
+						</div>
 						<div class='z-depth-1' style='padding: 10px 20px 10px 20px; margin: 20px 0 20px 0'>
-							<p>Total Donations: $total_donations</p>
 							<p>Funds Needed: RM$fundsNeeded</p>
 							<p>Funds Gathered: RM$fundsGathered</p>
 							<div class='center'>$donate_button</div>
@@ -406,6 +433,10 @@ class Event {
 				</div>
 			</div>
 		";
+	}
+
+	public function getImageDirectory() {
+		return $this->image_directory;
 	}
 
 	public function getID() {
