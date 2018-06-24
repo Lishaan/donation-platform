@@ -32,6 +32,14 @@
 			</ul>
 		</div>
 	</div>
+
+	<script type="text/javascript">
+		$(document).ready(() => {
+			$('.tabs').tabs();
+			$('select').formSelect();
+		});
+	</script>
+	
 	<!-- Donators -->
 	<div id="donator" class="col s12">
 		<div class="row">
@@ -115,10 +123,3 @@
 		</div>
 	</div>
 </div>
-
-<script type="text/javascript">
-	$(document).ready(() => {
-		$('.tabs').tabs();
-		$('select').formSelect();
-	});
-</script>

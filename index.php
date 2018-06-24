@@ -35,6 +35,11 @@ render_navbar("Home");
 		?> 
 	</center>
 </main>
-
+<script type="text/javascript">
+	$(document).ready(() => {
+		$('.tabs').tabs();
+		$('select').formSelect();
+	});
+</script>
 <?php
 require($root_dir . '/fragments/footer.php');
