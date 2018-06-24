@@ -1,3 +1,7 @@
+<script type="text/javascript" src="assets/js/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>									      <script type="text/javascript" src="chartjs/myNewChart.js"></script>
+<script type="text/javascript" src="chartjs/js/app.js"></script>
+
 <?php $root_dir = $_SERVER["DOCUMENT_ROOT"];
 session_start();
 require($root_dir . '/includes/dbh.inc.php');
@@ -270,6 +274,14 @@ render_navbar("Profile - " . $user->getName());
 		</div>
 		<div id="statistics" class="col s12">
 			<?php render_profile_info($user, $following) ?>
+			<div class="col s6">
+			
+				<ul class="collection">
+					<li class="collection-item" style="height: 400px">									
+						<canvas id ="mycanvas" height="150" width="400"></canvas>									
+					</li>
+				</ul>
+			</div> 
 		</div>
 	</div>
 </main>
