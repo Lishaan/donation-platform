@@ -415,16 +415,16 @@ class User {
 			$connection->close();
 			echo ("
 				<script type='text/javascript'> 
-				window.location.href='../profile.php?user_id=$user_id&donate_event=success$goback';
+				window.location.href='../event.php?event_id=$event_id&donate_event=success$goback';
 				</script>
 				");
 		} else {
 			$connection->close();
 			echo ("
 				<script type='text/javascript'> 
-				window.location.href='../profile.php?user_id=$user_id&donate_event=failed$goback';
+				window.location.href='../event.php?event_id=$event_id&donate_event=failed$goback';
 				</script>
-				");
+			");
 		}
 	}
 

@@ -106,6 +106,22 @@ if ($_GET['upload-file'] === "file-type") {
 	</script>
 	<?php
 }
+
+if ($_GET['change-password'] === "mismatch") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'Your current password does not match the password in the database'})
+	</script>
+	<?php
+}
+
+if ($_GET['change-password'] === "success") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'Password changed successfully'})
+	</script>
+	<?php
+}
 ?>
 
 
@@ -157,8 +173,36 @@ if ($_GET['upload-file'] === "file-type") {
 		</div>
 
 		<div id="ChangePassword" class="tabcontent z-depth-1" style="display: none;">
-			<h3>Change password</h3>
-			<p></p> 
+			<form action="profile.php?user_id=<?php echo $active_user->getID() ?>&edit-profile=true" method="POST">
+				<div class="row" style="margin-top: 60px;">
+					<div class="input-field col s12">
+						<i class="material-icons prefix" style="padding-right: 20px;">lock</i>
+						<input id="password_1" placeholder="Enter your current password" name="password_old" type="password" class="validate">
+						<label for="password"><b>Current Password</b></label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s12">
+						<i class="material-icons prefix" style="padding-right: 20px;">lock</i>
+						<input id="password_2" placeholder="Enter your new password" name="password_new" type="password" class="validate">
+						<label for="password"><b>New Password</b></label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s12">
+						<i class="material-icons prefix" style="padding-right: 20px;">lock</i>
+						<input id="password_3" placeholder="Re-enter your new password" name="password_new2" type="password" class="validate">
+						<label for="password"><b>Re-enter New Password</b></label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col s12" >
+						<button disabled class="btn-small waves-effect waves-light " type="submit" name="change_password" id="change_password" style="float: right">
+							Change password<i class="material-icons right">send</i>
+						</button>
+					</div>
+				</div>
+			</form>
 		</div>
 	</div>
 </center>
@@ -180,5 +224,23 @@ if ($_GET['upload-file'] === "file-type") {
 		document.getElementById(idName).style.display = "block";
 		evt.currentTarget.className += " active";
 	}
+
+	$(document).ready(() => {
+		$('#password_1').on("keyup", passwordCheck);
+		$('#password_2').on("keyup", passwordCheck);
+		$('#password_3').on("keyup", passwordCheck);
+
+		function passwordCheck() {
+			$check = ($('#password_1').val().length > 0) && ($('#password_2').val() == $('#password_3').val());
+
+			console.log($('#password_1').val());
+
+			if ($check && $('#password_2').val().length > 0) {
+				$('#change_password').prop("disabled", false);
+			} else {
+				$('#change_password').prop("disabled", true);
+			}
+		}
+	});
 </script>
 <?php }

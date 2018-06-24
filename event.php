@@ -8,17 +8,28 @@ $active_user;
 $event;
 $user;
 
+if ($_GET['donate_event'] === "success") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'Your donation has been made successfully'})
+	</script>
+	<?php
+}
+
+if ($_GET['donate_event'] === "failed") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'There was an error donating to the event'})
+	</script>
+	<?php
+}
+
 if (isset($_GET['event_id'])) {
 	$active_user = new User((int) $_SESSION['user_id']);
 	$event = new Event((int) $_GET['event_id']);
 	$user = $event->getPosterUser();
 
 	if (Event::exists($event) and User::exists($active_user)) {
-
-
-
-		// echo ("D");
-
 
 	} else {
 		echo ("
@@ -33,6 +44,10 @@ if (isset($_GET['event_id'])) {
 			window.location.href='../index.php?view_event=failed';
 		</script>
 	");
+}
+
+if (isset($_GET['donation_amount']) and isset($_POST['donation_submit'])) {
+	$active_user->donateEvent((int) $_GET['event_id'], (double) $_GET['donation_amount'], (int) $active_user->getID());
 }
 
 require($root_dir . '/fragments/head.php');

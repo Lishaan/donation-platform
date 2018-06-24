@@ -155,11 +155,6 @@ if (isset($_GET['user_id'])) {
 			$active_user->deleteEvent((int) $_GET['delete_event_id']);
 		}
 
-		// Submit like
-		if (isset($_POST['donate_button'])) {
-			$active_user->donateEvent((int) $_GET['event_id'], (double) $_POST['donation_amount'], (int) $user->getID());
-		}
-
 		// Submit Comment
 		if (isset($_POST['post_comment'])) {
 			$active_user->commentPost((int) $_GET['post_id'], (string) $_POST['comment_body']);
@@ -266,6 +261,68 @@ if (isset($_GET['user_id'])) {
 					</script>
 				");
 			}
+		}
+
+		// Settings -> Change password
+		if (isset($_POST['change_password'])) {
+
+			$old_password = mysqli_real_escape_string($connection, $_POST['password_old']);
+			$new_password = mysqli_real_escape_string($connection, $_POST['password_new']);
+			$new_password_retyped = mysqli_real_escape_string($connection, $_POST['password_new2']);
+
+			if ($new_password === $new_password_retyped) {
+
+				$user_id = $_SESSION['user_id'];
+				$hashed_old_password = password_hash($old_password, PASSWORD_DEFAULT);
+
+				$result = mysqli_query($connection, "SELECT * FROM users WHERE id='$user_id'");
+
+				if (mysqli_num_rows($result) < 1) {
+					echo ("
+						<script type='text/javascript'> 
+							window.location.href='profile.php?user_id=$user_id&edit-profile=true'; 
+						</script>
+					");
+				} else {
+
+					if ($row = mysqli_fetch_assoc($result)) {
+						
+						$matched_password = password_verify($old_password, $row['password']);
+
+						if ($matched_password === false) {
+							echo ("
+								<script type='text/javascript'> 
+									window.location.href='profile.php?user_id=$user_id&edit-profile=true&change-password=mismatch'; 
+								</script>
+							");
+						} elseif ($matched_password === true) {				
+
+
+							$hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+							mysqli_query (
+								$connection, 
+								"UPDATE users SET password='$hashed_new_password' WHERE id='$user_id'"
+							);
+
+							echo ("
+								<script type='text/javascript'> 
+									window.location.href='profile.php?user_id=$user_id&edit-profile=true&change-password=success'; 
+								</script>
+							");
+						}
+					}
+				}
+			} else {
+				echo ("
+					<script type='text/javascript'> 
+						window.location.href='../shop.php?change-password=mismatch'; 
+						window.alert('Please retype the same password');
+					</script>
+				");
+			}
+
+
 		}
 
 	} else {

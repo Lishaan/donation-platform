@@ -417,7 +417,7 @@ class Event {
 
 				<!-- Modal Structure -->
 				<div id='pledgeModal$user_id$donator_user_id$event_id' class='modal'>
-					<form action='profile.php?user_id=$user_id&event_id=$event_id&pledge=true$goback' method='POST'>
+					<form action='donate.php?event_id=$event_id&user_id=$user_id' method='POST'>
 						<div class='modal-content'>
 							<h4>Donate event</h4>
 							<p style='margin-bottom: 40px;'>You are about to donate to the event posted by $poster_user_name.</p>
@@ -435,16 +435,14 @@ class Event {
 		";
 	}
 
-	public function getImageDirectory() {
-		return $this->image_directory;
-	}
+	public function getImageDirectory() { return $this->image_directory; }
 
-	public function getID() {
-		return $this->id;
-	}
+	public function getID() { return $this->id; }
 
-	public function getPosterUser() {
-		return $this->poster_user;
+	public function getPosterUser() { return $this->poster_user; }
+
+	public function getFundsNeeded() {
+		return $this->fundsNeeded;
 	}
 
 	public static function exists($event) {
