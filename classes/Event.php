@@ -1,6 +1,4 @@
-<?php $root_dir = $_SERVER["DOCUMENT_ROOT"];
-
-class Event {
+<?php class Event {
 	private $id;
 	private $image_directory;
 	private $poster_user;

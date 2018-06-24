@@ -2,7 +2,7 @@
 	<div class="container" style="width: 90%">
 		<div class="row" ">
 			<div class="col l3 " style="line-height: ">
-				<h5 class="white-text">Logo</h5>
+				<img src="assets/icons/favicon.ico" style="height: 80px; width: 80px" alt="">
 			</div>
 			<div class="col l3 " style="text-align: left; line-height: 30px">
 				<h5 class="white-text">Learn More</h5>
@@ -18,6 +18,7 @@
 				<h5 class="white-text">Browse Categories</h5>
 				<ul class="footer-list">
 					<?php
+
 					$categories = Database::getCategories();
 
 					foreach ($categories as $category) {
@@ -30,11 +31,8 @@
 			<div class="col l3" style="text-align: left; line-height: 30px">
 				<h5 class="white-text">Customer Service</h5>
 				<ul class="footer-list">
-					<li><a class="grey-text text-lighten-3" href="#">Help & FAQS</a></li>
-					<li><a class="grey-text text-lighten-3" href="#">Terms of Service</a></li>
-					<li><a class="grey-text text-lighten-3" href="#">Privacy Policy</a></li>
-					<li><a class="grey-text text-lighten-3" href="#">Contact Us</a></li>
-					<li><a class="grey-text text-lighten-3" href="#">Site Map</a></li>
+					<li><a class="grey-text text-lighten-3" href="#">Contact Us at (017-3403044)</a></li>
+					<li><a class="grey-text text-lighten-3" href="index.php?page=terms-of-service">Terms of Service</a></li>
 				</ul>
 			</div>
 		</div>

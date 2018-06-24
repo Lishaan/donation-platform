@@ -274,6 +274,7 @@ render_navbar("Profile - " . $user->getName());
 	</div>
 </main>
 <?php endif; ?>
+
 <script type="text/javascript">
 	$(document).ready(() => {
 		$('.sidenav').sidenav();
@@ -316,5 +317,5 @@ render_navbar("Profile - " . $user->getName());
 		}
 	});
 </script>
-<?php
-require($root_dir . '/fragments/footer.php');
+
+<?php require($root_dir . '/fragments/footer.php');

@@ -31,10 +31,9 @@ class User {
 				} else if (isset($_GET['event_id'])) {
 					echo ("
 						<script type='text/javascript'> 
-							window.location.href='$_SERVER[REQUEST_URI]&login=required';
+							window.location.href='index.php?login=required';
 						</script>
 					");
-					echo "Dd";
 				}
 			} else {
 				die("User unable to construct");

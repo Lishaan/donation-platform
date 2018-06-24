@@ -34,3 +34,7 @@ body {
 	color: black;
 	border-radius: 16px
 }
+
+#panel_1 {
+	content: url("../img/about/about_1.jpg");
+}

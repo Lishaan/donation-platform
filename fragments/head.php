@@ -4,6 +4,7 @@
 <html>
 <head>
     <title><?php echo $title; ?></title>
+    <link rel="shortcut icon" href="assets/icons/favicon.ico" />
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->

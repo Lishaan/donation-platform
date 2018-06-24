@@ -2,22 +2,27 @@
 $root_dir = $_SERVER["DOCUMENT_ROOT"];
 
 require($root_dir . '/components/home_event.php'); 
+
+if ($_GET['login'] === "required") {
+	?>
+	<script type="text/javascript">
+		M.toast({html: 'You must login to perform that action'})
+	</script>
+	<?php
+}
 ?>
 <link rel="stylesheet" href="assets/css/home.css">
 
 <!-- Carousel -->
 <div class="carousel carousel-slider center z-depth-2">
-	<div class="carousel-item teal lighten-2" href="">
-		<h2>Panel</h2>
-		<p class="white-text">Panel A</p>
+	<div class="carousel-item teal lighten-2" href="" style="height: 20px">
+		<img src="assets/img/home/panel_1.png" alt="" style="object-fit: cover;">
 	</div>
-	<div class="carousel-item teal lighten-2" href="">
-		<h2>Panel</h2>
-		<p class="white-text">Panel B</p>
+	<div class="carousel-item teal lighten-2" href="" style="height: 20px">
+		<img src="assets/img/home/panel_2.jpg" alt="" style="object-fit: cover;">
 	</div>
-	<div class="carousel-item teal lighten-2" href="">
-		<h2>Panel</h2>
-		<p class="white-text">Panel C</p>
+	<div class="carousel-item teal lighten-2" href="" style="height: 20px">
+		<img src="assets/img/home/panel_3.png" alt="" style="object-fit: cover;">
 	</div>
 </div>
 
@@ -28,33 +33,47 @@ require($root_dir . '/components/home_event.php');
 	</div>
 	<div class="row" style="margin-top: 20px;">
 		<?php
-		$id = 0;
-		$imgs = array(
-			"assets/img/sample-2.jpg",
-			"assets/img/sample-5.jpg",
-			"assets/img/tigerEvent.jpg",
-			"assets/img/tigerEvent.jpg",
-			"assets/img/sample-1.jpg",
-			"assets/img/traffickingEvent.jpg"
-		);
+		$connection = Database::getConnection();
+		$sql = "SELECT * FROM events ORDER BY likes DESC LIMIT 6";
+		$result = mysqli_query($connection, $sql);
+		$connection->close();
+
+		$events = array();
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			array_push($events, $row);
+		}
+
 		?>
 		<script type="text/javascript">
 			var percentages = [];
 		</script>
 		<?php
 
-		foreach ($imgs as $img) {
-			$url = "#";
-			$desc = "Description";
-			$money_raised = 9999;
-			$money_needed = 20000;
+		$id = 0;
+		foreach ($events as $event) {
+			$poster_user_id = $event['poster_user_id'];
 
-			render_home_event($id, $url, $img, $desc, $money_raised, $money_needed);
 
+			$connection = Database::getConnection();
+			$sql = "SELECT name FROM users WHERE id=$poster_user_id";
+			$result = mysqli_query($connection, $sql);
+			$connection->close();
+
+			$row = mysqli_fetch_assoc($result);
+
+			$url = "event.php?event_id=" . $event['id'];
+			$title = "Event by " . $row['name'];
+			$desc = $event['body'];
+			$img = $event['image_directory'];
+			$funds_needed = $event['fundsNeeded'];
+			$funds_gathered = $event['fundsGathered'];
+
+			render_home_event($id, $url, $img, $desc, $funds_gathered, $funds_needed, $title);
 			$id++;
 			?>
 			<script type="text/javascript">
-				percentages.push(<?php echo ($money_raised/$money_needed*100) ?>);
+				percentages.push(<?php echo ($funds_gathered/$funds_needed*100) ?>);
 			</script>
 			<?php
 		}

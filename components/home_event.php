@@ -31,15 +31,15 @@
 }
 </style>
 
-<?php function render_home_event($id = 0, $url = "#", $img = "#", $desc = "", $money_raised = 0, $money_needed = 0) { ?>
+<?php function render_home_event($id = 0, $url = "#", $img = "#", $desc = "", $money_raised = 0, $money_needed = 0, $title = "") { ?>
 	<div class="col s4">
 		<a href="<?php echo $url ?>">
 			<div class="card white large hoverable z-depth-1" >
 				<div class="card-image"><img src="<?php echo $img ?>"></div>
 
-				<div class="card-content white-text" style="padding: 10px">
-					<span class="card-title" style="color: black; font-weight: bold;">Charity for Tigers</span>
-					<p style="color: black;"><?php echo $desc ?></p>
+				<div class="card-content white-text" style="padding: 10px; overflow: scroll">
+					<span class="card-title" style="color: black; font-weight: bold;"><?php echo $title ?></span>
+					<p style="color: black; margin-bottom: 20px;"><?php echo $desc ?></p>
 				</div>
 
 				<div class="card-action" style="padding:6px; padding-top: 0px;">

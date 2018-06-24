@@ -7,10 +7,10 @@ function render_navbar($activepage) { ?>
 			<nav>
 				<div class="nav-wrapper teal darken-2">
 
-					<a href="index.php" class="brand-logo" style="margin-left: 10px">Logo</a>
+					<a href="index.php" class="brand-logo" style="margin-left: 20px"><img src="assets/icons/favicon.ico" style="height: 60px; width: 60px; bottom: 2;" alt=""></a>
 					<ul class="left hide-on-med-and-down" style="margin-left: 100px"> 
 						<li class="<?php echo $activepage === 'Home' ? "active" : '' ?>"><a href="index.php">Home</a></li>
-						<li class="<?php echo $activepage === 'About' ? "active" : '' ?>"><a href="#">About</a></li>
+						<li class="<?php echo $activepage === 'About' ? "active" : '' ?>"><a href="about.php">About</a></li>
 						<li class="<?php echo substr($activepage, 0, 4) === 'Feed' ? "active" : '' ?>"><a href="feed.php">Feed</a></li>
 						<li class="<?php echo substr($activepage, 0, 7) === 'Explore' ? "active" : '' ?>"><a href="explore.php">Explore</a></li>
 					</ul>
